@@ -36,4 +36,28 @@ describe("generateMergeSortSteps", () => {
       expect(step.array).toHaveLength(4);
     }
   });
+
+  it("merge-compare highlights show the values named in the explanation", () => {
+    const inputs = [
+      [8, 3, 5, 1, 9, 2],
+      [3, 1, 2],
+      [1, 1, 1],
+      [4, 2, 3],
+    ];
+    for (const input of inputs) {
+      for (const step of generateMergeSortSteps(input)) {
+        if (step.codeLineId !== "merge-compare") continue;
+        const match = step.explanation.match(/Compare (\d+) and (\d+)/);
+        expect(match).not.toBeNull();
+        const leftVal = Number(match![1]);
+        const rightVal = Number(match![2]);
+        const comparing = step.highlights.filter((h) => h.kind === "comparing");
+        expect(comparing).toHaveLength(2);
+        const highlighted = comparing.map((h) => step.array[h.index]!);
+        expect(highlighted.sort((a, b) => a - b)).toEqual(
+          [leftVal, rightVal].sort((a, b) => a - b),
+        );
+      }
+    }
+  });
 });

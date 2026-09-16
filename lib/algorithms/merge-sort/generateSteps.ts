@@ -9,9 +9,10 @@ export function generateMergeSortSteps(input: number[]): Step[] {
     explanation: string,
     highlights: Highlight[] = [],
     range?: Step["range"],
+    arraySnapshot?: number[],
   ) => {
     steps.push({
-      array: [...arr],
+      array: [...(arraySnapshot ?? arr)],
       highlights,
       range,
       codeLineId,
@@ -62,15 +63,22 @@ export function generateMergeSortSteps(input: number[]): Step[] {
     let i = 0;
     let j = 0;
     let k = low;
+
     while (i < left.length && j < right.length) {
+      const leftIndex = low + i;
+      const rightIndex = mid + 1 + j;
+      const compareSnapshot = [...arr];
+      compareSnapshot[leftIndex] = left[i]!;
+      compareSnapshot[rightIndex] = right[j]!;
       push(
         "merge-compare",
         `Compare ${left[i]} and ${right[j]}.`,
         [
-          { index: low + i, kind: "comparing" },
-          { index: mid + 1 + j, kind: "comparing" },
+          { index: leftIndex, kind: "comparing" },
+          { index: rightIndex, kind: "comparing" },
         ],
         { low, mid, high },
+        compareSnapshot,
       );
       if (left[i]! <= right[j]!) {
         arr[k] = left[i]!;
