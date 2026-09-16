@@ -7,3 +7,4 @@ export {
   ExplanationPanel,
   type ExplanationPanelProps,
 } from "./ExplanationPanel";
+export { MergeSortStudio } from "./MergeSortStudio";
