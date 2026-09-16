@@ -1,0 +1,52 @@
+import type { CodeLine } from "@/lib/algorithms/types";
+
+export const MERGE_SORT_CODE: Record<
+  "python" | "javascript" | "cpp",
+  CodeLine[]
+> = {
+  python: [
+    { id: "fn-def", text: "def merge_sort(arr, low, high):" },
+    { id: "base-case", text: "    if low >= high: return" },
+    { id: "split", text: "    mid = (low + high) // 2" },
+    { id: "recurse-left", text: "    merge_sort(arr, low, mid)" },
+    { id: "recurse-right", text: "    merge_sort(arr, mid + 1, high)" },
+    { id: "merge-init", text: "    merge(arr, low, mid, high)" },
+    { id: "merge-compare", text: "    # compare left[i] vs right[j]" },
+    { id: "merge-take-left", text: "    # take from left half" },
+    { id: "merge-take-right", text: "    # take from right half" },
+    { id: "merge-exhaust-left", text: "    # copy remaining left" },
+    { id: "merge-exhaust-right", text: "    # copy remaining right" },
+    { id: "write-back", text: "    # subarray [low, high] merged" },
+    { id: "done", text: "# done: arr is sorted" },
+  ],
+  javascript: [
+    { id: "fn-def", text: "function mergeSort(arr, low, high) {" },
+    { id: "base-case", text: "  if (low >= high) return;" },
+    { id: "split", text: "  const mid = Math.floor((low + high) / 2);" },
+    { id: "recurse-left", text: "  mergeSort(arr, low, mid);" },
+    { id: "recurse-right", text: "  mergeSort(arr, mid + 1, high);" },
+    { id: "merge-init", text: "  merge(arr, low, mid, high);" },
+    { id: "merge-compare", text: "  // compare left[i] vs right[j]" },
+    { id: "merge-take-left", text: "  // take from left half" },
+    { id: "merge-take-right", text: "  // take from right half" },
+    { id: "merge-exhaust-left", text: "  // copy remaining left" },
+    { id: "merge-exhaust-right", text: "  // copy remaining right" },
+    { id: "write-back", text: "  // subarray [low, high] merged" },
+    { id: "done", text: "// done: arr is sorted" },
+  ],
+  cpp: [
+    { id: "fn-def", text: "void mergeSort(vector<int>& arr, int low, int high) {" },
+    { id: "base-case", text: "  if (low >= high) return;" },
+    { id: "split", text: "  int mid = low + (high - low) / 2;" },
+    { id: "recurse-left", text: "  mergeSort(arr, low, mid);" },
+    { id: "recurse-right", text: "  mergeSort(arr, mid + 1, high);" },
+    { id: "merge-init", text: "  merge(arr, low, mid, high);" },
+    { id: "merge-compare", text: "  // compare left[i] vs right[j]" },
+    { id: "merge-take-left", text: "  // take from left half" },
+    { id: "merge-take-right", text: "  // take from right half" },
+    { id: "merge-exhaust-left", text: "  // copy remaining left" },
+    { id: "merge-exhaust-right", text: "  // copy remaining right" },
+    { id: "write-back", text: "  // subarray [low, high] merged" },
+    { id: "done", text: "// done: arr is sorted" },
+  ],
+};
