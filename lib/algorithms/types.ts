@@ -7,14 +7,41 @@ export type HighlightKind =
   | "low"
   | "mid"
   | "high"
-  | "pivot";
+  | "pivot"
+  | "current"
+  | "frontier"
+  | "visited"
+  | "treeEdge"
+  | "relaxed"
+  | "source";
 
 export type Highlight = { index: number; kind: HighlightKind };
+
+export type GraphEdge = { from: number; to: number };
+
+export type Graph = {
+  nodes: number[];
+  adj: Record<number, number[]>;
+};
+
+export type GraphFrame = {
+  nodes: number[];
+  edges: GraphEdge[];
+  source: number;
+  current: number | null;
+  frontier: number[];
+  visited: number[];
+  parent: Record<number, number | null>;
+  path: number[];
+  treeEdges: GraphEdge[];
+  relaxedEdges: GraphEdge[];
+};
 
 export type Step = {
   array: number[];
   highlights: Highlight[];
   range?: { low: number; mid?: number; high: number };
+  graph?: GraphFrame;
   codeLineId: string;
   explanation: string;
 };
@@ -27,11 +54,14 @@ export type ComplexityCase = {
   space: string;
 };
 
+export type AlgorithmFamily = "sorting" | "searching" | "graphs";
+
 export type AlgorithmMeta = {
   slug: string;
   title: string;
   summary: string;
   status: "ready" | "coming-soon";
+  family: AlgorithmFamily;
   complexity: ComplexityCase[];
   complexityNote: string;
 };
@@ -40,3 +70,4 @@ export type PlaybackSpeed = 0.5 | 1 | 1.5 | 2 | 3 | 4;
 
 export const BASE_STEP_MS = 700;
 export const MAX_ARRAY_LENGTH = 16;
+export const MAX_GRAPH_NODES = 12;

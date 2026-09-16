@@ -2,12 +2,67 @@ import type { AlgorithmMeta } from "@/lib/algorithms/types";
 import { binarySearchMeta } from "@/lib/algorithms/binary-search/meta";
 import { mergeSortMeta } from "@/lib/algorithms/merge-sort/meta";
 import { quickSortMeta } from "@/lib/algorithms/quick-sort/meta";
+import { bfsMeta } from "@/lib/algorithms/bfs/meta";
+
+const dfsMeta: AlgorithmMeta = {
+  slug: "dfs",
+  title: "DFS",
+  summary: "Explore as far as possible along each branch before backtracking.",
+  status: "coming-soon",
+  family: "graphs",
+  complexity: [
+    { label: "Best", time: "O(V+E)", space: "O(V)" },
+    { label: "Average", time: "O(V+E)", space: "O(V)" },
+    { label: "Worst", time: "O(V+E)", space: "O(V)" },
+  ],
+  complexityNote: "A stack (or recursion) is the frontier — contrast with BFS’s queue.",
+};
+
+const dijkstraMeta: AlgorithmMeta = {
+  slug: "dijkstra",
+  title: "Dijkstra",
+  summary: "Find shortest paths on weighted graphs with non-negative edges.",
+  status: "coming-soon",
+  family: "graphs",
+  complexity: [
+    { label: "Best", time: "O((V+E) log V)", space: "O(V)" },
+    { label: "Average", time: "O((V+E) log V)", space: "O(V)" },
+    { label: "Worst", time: "O((V+E) log V)", space: "O(V)" },
+  ],
+  complexityNote: "Priority queue of distances; BFS is the unweighted special case.",
+};
+
+const topologicalSortMeta: AlgorithmMeta = {
+  slug: "topological-sort",
+  title: "Topological Sort",
+  summary: "Order vertices of a DAG so every edge goes from earlier to later.",
+  status: "coming-soon",
+  family: "graphs",
+  complexity: [
+    { label: "Best", time: "O(V+E)", space: "O(V)" },
+    { label: "Average", time: "O(V+E)", space: "O(V)" },
+    { label: "Worst", time: "O(V+E)", space: "O(V)" },
+  ],
+  complexityNote: "Kahn’s algorithm uses a queue of in-degree-zero nodes; DFS finishing times also work.",
+};
 
 export const algorithms: AlgorithmMeta[] = [
   mergeSortMeta,
-  binarySearchMeta,
   quickSortMeta,
+  binarySearchMeta,
+  bfsMeta,
+  dfsMeta,
+  dijkstraMeta,
+  topologicalSortMeta,
 ];
+
+export const FAMILY_ORDER = ["sorting", "searching", "graphs"] as const;
+
+export const FAMILY_TITLES: Record<(typeof FAMILY_ORDER)[number], string> = {
+  sorting: "Sorting",
+  searching: "Searching",
+  graphs: "Graphs",
+};
 
 export function getAlgorithm(slug: string): AlgorithmMeta | undefined {
   return algorithms.find((a) => a.slug === slug);

@@ -5,6 +5,7 @@ export const binarySearchMeta: AlgorithmMeta = {
   title: "Binary Search",
   summary: "Find a target in a sorted array by halving the search space.",
   status: "ready",
+  family: "searching",
   complexity: [
     { label: "Best", time: "O(1)", space: "O(1)" },
     { label: "Average", time: "O(log n)", space: "O(1)" },

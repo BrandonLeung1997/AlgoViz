@@ -14,6 +14,12 @@ const KIND_CLASS: Record<HighlightKind, string> = {
   mid: "bg-amber-400",
   high: "bg-sky-800",
   pivot: "bg-rose-500",
+  current: "bg-amber-400",
+  frontier: "bg-sky-300",
+  visited: "bg-green-600",
+  treeEdge: "bg-green-500",
+  relaxed: "bg-amber-300",
+  source: "bg-sky-600",
 };
 
 const KIND_PRIORITY: HighlightKind[] = [

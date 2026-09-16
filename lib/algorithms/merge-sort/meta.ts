@@ -6,6 +6,7 @@ export const mergeSortMeta: AlgorithmMeta = {
   summary:
     "Divide the array, sort each half, then merge — stable O(n log n) sorting.",
   status: "ready",
+  family: "sorting",
   complexity: [
     { label: "Best", time: "O(n log n)", space: "O(n)" },
     { label: "Average", time: "O(n log n)", space: "O(n)" },
