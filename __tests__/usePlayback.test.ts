@@ -1,7 +1,9 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
+import { useCallback } from "react";
 import { usePlayback } from "@/lib/playback/usePlayback";
 import { generateMergeSortSteps } from "@/lib/algorithms/merge-sort/generateSteps";
+import { generateBinarySearchSteps } from "@/lib/algorithms/binary-search/generateSteps";
 
 describe("usePlayback", () => {
   beforeEach(() => {
@@ -67,5 +69,37 @@ describe("usePlayback", () => {
     expect(result.current.inputError).toBeTruthy();
     expect(result.current.steps.length).toBe(prevLen);
     expect(result.current.input).toEqual([3, 1, 2]);
+  });
+
+  it("plays a binary search timeline", () => {
+    const generate = (input: number[]) => generateBinarySearchSteps(input, 3);
+    const { result } = renderHook(() => usePlayback(generate, [1, 2, 3, 4, 5]));
+    expect(result.current.steps.length).toBeGreaterThan(0);
+    expect(result.current.steps[result.current.steps.length - 1]!.codeLineId).toBe(
+      "found",
+    );
+    act(() => result.current.stepForward());
+    expect(result.current.index).toBe(1);
+  });
+
+  it("regenerates steps when generateSteps identity changes", () => {
+    const { result, rerender } = renderHook(
+      ({ target }: { target: number }) => {
+        const generate = useCallback(
+          (input: number[]) => generateBinarySearchSteps(input, target),
+          [target],
+        );
+        return usePlayback(generate, [1, 3, 5, 7]);
+      },
+      { initialProps: { target: 7 } },
+    );
+    expect(result.current.steps.at(-1)?.codeLineId).toBe("found");
+    act(() => result.current.stepForward());
+    expect(result.current.index).toBeGreaterThan(0);
+
+    rerender({ target: 2 });
+    expect(result.current.index).toBe(0);
+    expect(result.current.playing).toBe(false);
+    expect(result.current.steps.at(-1)?.codeLineId).toBe("not-found");
   });
 });

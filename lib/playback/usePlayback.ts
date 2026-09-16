@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { PlaybackSpeed, Step } from "@/lib/algorithms/types";
 import { BASE_STEP_MS } from "@/lib/algorithms/types";
 import { parseArrayInput } from "@/lib/algorithms/parseInput";
@@ -17,8 +17,16 @@ export function usePlayback(
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState<PlaybackSpeed>(1);
+  const inputRef = useRef(input);
+  inputRef.current = input;
 
   const step = steps[index];
+
+  useEffect(() => {
+    setSteps(generateSteps(inputRef.current));
+    setIndex(0);
+    setPlaying(false);
+  }, [generateSteps]);
 
   const regenerate = useCallback(
     (next: number[]) => {

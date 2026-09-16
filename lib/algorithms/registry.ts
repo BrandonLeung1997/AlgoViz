@@ -1,20 +1,10 @@
 import type { AlgorithmMeta } from "@/lib/algorithms/types";
+import { binarySearchMeta } from "@/lib/algorithms/binary-search/meta";
 import { mergeSortMeta } from "@/lib/algorithms/merge-sort/meta";
 
 export const algorithms: AlgorithmMeta[] = [
   mergeSortMeta,
-  {
-    slug: "binary-search",
-    title: "Binary Search",
-    summary: "Find a target in a sorted array by halving the search space.",
-    status: "coming-soon",
-    complexity: [
-      { label: "Best", time: "O(1)", space: "O(1)" },
-      { label: "Average", time: "O(log n)", space: "O(1)" },
-      { label: "Worst", time: "O(log n)", space: "O(1)" },
-    ],
-    complexityNote: "Coming soon.",
-  },
+  binarySearchMeta,
   {
     slug: "quick-sort",
     title: "Quick Sort",

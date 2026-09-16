@@ -25,3 +25,16 @@ export function parseArrayInput(
   }
   return { ok: true, values };
 }
+
+export function parseTargetInput(
+  raw: string,
+): { ok: true; value: number } | { ok: false; error: string } {
+  const trimmed = raw.trim();
+  if (!trimmed) {
+    return { ok: false, error: "Enter a target integer." };
+  }
+  if (!/^-?\d+$/.test(trimmed)) {
+    return { ok: false, error: `“${trimmed}” is not an integer.` };
+  }
+  return { ok: true, value: Number(trimmed) };
+}

@@ -3,7 +3,10 @@ export type HighlightKind =
   | "writing"
   | "sorted"
   | "activeRange"
-  | "copy";
+  | "copy"
+  | "low"
+  | "mid"
+  | "high";
 
 export type Highlight = { index: number; kind: HighlightKind };
 
