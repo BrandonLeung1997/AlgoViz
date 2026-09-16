@@ -2,8 +2,13 @@ import Link from "next/link";
 import type { AlgorithmMeta } from "@/lib/algorithms/types";
 
 export function AlgorithmCard({ algo }: { algo: AlgorithmMeta }) {
+  const cardClass =
+    algo.status === "ready"
+      ? "rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-sky-300 hover:shadow-md cursor-pointer"
+      : "rounded-lg border border-slate-200 bg-white p-5 shadow-sm cursor-default";
+
   const inner = (
-    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-sky-300">
+    <div className={cardClass}>
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-lg font-semibold text-slate-900">{algo.title}</h2>
         {algo.status === "coming-soon" && (

@@ -27,22 +27,20 @@ function CodeBlock({
 }) {
   return (
     <pre className="overflow-x-auto rounded-md border border-slate-200 bg-slate-50 p-3 font-mono text-xs leading-relaxed text-slate-800">
-      <code>
-        {lines.map((line) => {
-          const active = line.id === activeLineId;
-          return (
-            <div
-              key={line.id}
-              className={cn(
-                "border-l-2 border-transparent px-2 py-0.5",
-                active && "border-amber-500 bg-amber-100",
-              )}
-            >
-              {line.text || "\u00a0"}
-            </div>
-          );
-        })}
-      </code>
+      {lines.map((line) => {
+        const active = line.id === activeLineId;
+        return (
+          <div
+            key={line.id}
+            className={cn(
+              "border-l-2 border-transparent px-2 py-0.5",
+              active && "border-amber-500 bg-amber-100",
+            )}
+          >
+            {line.text || "\u00a0"}
+          </div>
+        );
+      })}
     </pre>
   );
 }
