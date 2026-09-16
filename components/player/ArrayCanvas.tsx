@@ -13,12 +13,14 @@ const KIND_CLASS: Record<HighlightKind, string> = {
   low: "bg-sky-600",
   mid: "bg-amber-400",
   high: "bg-sky-800",
+  pivot: "bg-rose-500",
 };
 
 const KIND_PRIORITY: HighlightKind[] = [
   "writing",
   "copy",
   "sorted",
+  "pivot",
   "comparing",
   "mid",
   "low",
@@ -44,12 +46,21 @@ export type ArrayCanvasProps = {
   showPointers?: boolean;
 };
 
-function pointerTags(index: number, range: Step["range"]): string | null {
-  if (!range) return null;
+function pointerTags(
+  index: number,
+  range: Step["range"],
+  highlights: Step["highlights"],
+  showPointers: boolean,
+): string | null {
   const tags: string[] = [];
-  if (index === range.low) tags.push("L");
-  if (range.mid !== undefined && index === range.mid) tags.push("M");
-  if (index === range.high) tags.push("H");
+  if (showPointers && range) {
+    if (index === range.low) tags.push("L");
+    if (range.mid !== undefined && index === range.mid) tags.push("M");
+    if (index === range.high) tags.push("H");
+  }
+  if (highlights.some((h) => h.kind === "pivot" && h.index === index)) {
+    tags.push("P");
+  }
   return tags.length > 0 ? tags.join("/") : null;
 }
 
@@ -57,6 +68,8 @@ export function ArrayCanvas({ step, showPointers = false }: ArrayCanvasProps) {
   const array = step?.array ?? [];
   const highlights = step?.highlights ?? [];
   const maxVal = Math.max(...array, 1);
+  const hasPivot = highlights.some((h) => h.kind === "pivot");
+  const showTags = showPointers || hasPivot;
 
   return (
     <div>
@@ -84,22 +97,33 @@ export function ArrayCanvas({ step, showPointers = false }: ArrayCanvasProps) {
                 title={`Index ${index}: ${value}`}
               />
               <span className="text-xs tabular-nums text-slate-600">{value}</span>
-              {showPointers ? (
+              {showTags ? (
                 <span className="h-4 text-[10px] font-semibold text-sky-700">
-                  {pointerTags(index, step?.range) ?? "\u00a0"}
+                  {pointerTags(index, step?.range, highlights, showPointers) ??
+                    "\u00a0"}
                 </span>
               ) : null}
             </div>
           ))
         )}
       </div>
-      {showPointers ? (
+      {showPointers || hasPivot ? (
         <p className="mt-2 text-center text-xs text-slate-500">
-          <span className="font-semibold text-sky-700">L</span> low
-          {" · "}
-          <span className="font-semibold text-amber-600">M</span> mid
-          {" · "}
-          <span className="font-semibold text-sky-800">H</span> high
+          {showPointers ? (
+            <>
+              <span className="font-semibold text-sky-700">L</span> low
+              {" · "}
+              <span className="font-semibold text-amber-600">M</span> mid
+              {" · "}
+              <span className="font-semibold text-sky-800">H</span> high
+            </>
+          ) : null}
+          {showPointers && hasPivot ? " · " : null}
+          {hasPivot ? (
+            <>
+              <span className="font-semibold text-rose-600">P</span> pivot
+            </>
+          ) : null}
         </p>
       ) : null}
     </div>

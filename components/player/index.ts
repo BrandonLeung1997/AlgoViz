@@ -9,3 +9,4 @@ export {
 } from "./ExplanationPanel";
 export { MergeSortStudio } from "./MergeSortStudio";
 export { BinarySearchStudio } from "./BinarySearchStudio";
+export { QuickSortStudio } from "./QuickSortStudio";

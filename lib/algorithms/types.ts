@@ -6,7 +6,8 @@ export type HighlightKind =
   | "copy"
   | "low"
   | "mid"
-  | "high";
+  | "high"
+  | "pivot";
 
 export type Highlight = { index: number; kind: HighlightKind };
 

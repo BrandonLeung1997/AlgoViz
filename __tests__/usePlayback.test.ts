@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { usePlayback } from "@/lib/playback/usePlayback";
 import { generateMergeSortSteps } from "@/lib/algorithms/merge-sort/generateSteps";
 import { generateBinarySearchSteps } from "@/lib/algorithms/binary-search/generateSteps";
+import { generateQuickSortSteps } from "@/lib/algorithms/quick-sort/generateSteps";
 
 describe("usePlayback", () => {
   beforeEach(() => {
@@ -101,5 +102,16 @@ describe("usePlayback", () => {
     expect(result.current.index).toBe(0);
     expect(result.current.playing).toBe(false);
     expect(result.current.steps.at(-1)?.codeLineId).toBe("not-found");
+  });
+
+  it("plays a quick sort timeline", () => {
+    const { result } = renderHook(() =>
+      usePlayback(generateQuickSortSteps, [4, 1, 3, 2]),
+    );
+    expect(result.current.steps.length).toBeGreaterThan(0);
+    expect(result.current.steps.at(-1)?.codeLineId).toBe("done");
+    expect(result.current.steps.at(-1)?.array).toEqual([1, 2, 3, 4]);
+    act(() => result.current.stepForward());
+    expect(result.current.index).toBe(1);
   });
 });
