@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { TableCanvas } from "@/components/player/TableCanvas";
 import { generateLcsSteps } from "@/lib/algorithms/lcs/generateSteps";
 import { generateEditDistanceSteps } from "@/lib/algorithms/edit-distance/generateSteps";
+import type { Step } from "@/lib/algorithms/types";
 
 afterEach(() => {
   cleanup();
@@ -28,5 +29,46 @@ describe("TableCanvas footer", () => {
     expect(screen.getByText(/Distance:/)).toBeInTheDocument();
     expect(screen.queryByText(/LCS:/)).not.toBeInTheDocument();
     expect(screen.getByText(/Distance:/).textContent).toMatch(/1/);
+  });
+});
+
+describe("TableCanvas axis labels", () => {
+  it("keeps character headers for LCS when labels are omitted", () => {
+    const step = generateLcsSteps("AB", "CD")[0];
+    render(<TableCanvas step={step} />);
+    expect(screen.getByText("A")).toBeInTheDocument();
+    expect(screen.getByText("B")).toBeInTheDocument();
+    expect(screen.getByText("C")).toBeInTheDocument();
+    expect(screen.getByText("D")).toBeInTheDocument();
+    expect(screen.getAllByText("ε").length).toBeGreaterThanOrEqual(2);
+    expect(screen.queryByText("w=2 v=3")).not.toBeInTheDocument();
+  });
+
+  it("renders knapsack item and capacity labels when provided", () => {
+    const step: Step = {
+      array: [],
+      highlights: [],
+      codeLineId: "done",
+      explanation: "done",
+      dpTable: {
+        x: "",
+        y: "",
+        cells: [
+          [0, 0, 0],
+          [0, 0, 3],
+        ],
+        rowLabels: ["ε", "w=2 v=3"],
+        colLabels: ["0", "1", "2"],
+        resultLabel: "Value",
+        reconstructed: "items 1 value=3",
+      },
+    };
+    render(<TableCanvas step={step} />);
+    expect(screen.getByText("w=2 v=3")).toBeInTheDocument();
+    expect(screen.getAllByText("0").length).toBeGreaterThan(0);
+    expect(screen.getByText("1")).toBeInTheDocument();
+    expect(screen.getByText("2")).toBeInTheDocument();
+    expect(screen.getByText(/Value:/)).toBeInTheDocument();
+    expect(screen.getByText(/items 1 value=3/)).toBeInTheDocument();
   });
 });

@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment } from "react";
-import type { DpCell, Step } from "@/lib/algorithms/types";
+import type { DpCell, DpTableFrame, Step } from "@/lib/algorithms/types";
 import { cn } from "@/lib/utils";
 
 export type TableCanvasProps = {
@@ -26,6 +26,18 @@ function cellClass(
   return "bg-white text-slate-800";
 }
 
+function columnHeaders(table: DpTableFrame): string[] {
+  if (table.colLabels && table.colLabels.length > 0) return table.colLabels;
+  return ["ε", ...table.y.split("")];
+}
+
+function rowHeader(table: DpTableFrame, i: number): string {
+  if (table.rowLabels && table.rowLabels[i] !== undefined) {
+    return table.rowLabels[i]!;
+  }
+  return i === 0 ? "ε" : (table.x[i - 1] ?? "");
+}
+
 export function TableCanvas({ step, resultLabel, hint }: TableCanvasProps) {
   const table = step?.dpTable;
   const cells = table?.cells ?? [];
@@ -44,7 +56,12 @@ export function TableCanvas({ step, resultLabel, hint }: TableCanvasProps) {
   const caption =
     hint ??
     "dp[i][j] = LCS length of X[:i] and Y[:j] (row-major fill)";
-  const colCount = (cells[0]?.length ?? 0) + 1;
+  const dataCols = cells[0]?.length ?? 0;
+  const customRowLabels = Boolean(table?.rowLabels?.length);
+  const headers = table ? columnHeaders(table) : ["ε", ...y.split("")];
+  const firstCol = customRowLabels
+    ? "minmax(4.75rem, max-content)"
+    : "minmax(2.25rem, 2.25rem)";
 
   return (
     <div>
@@ -60,44 +77,55 @@ export function TableCanvas({ step, resultLabel, hint }: TableCanvasProps) {
           <div
             className="mx-auto grid w-fit gap-1"
             style={{
-              gridTemplateColumns: `repeat(${colCount}, minmax(2.25rem, 2.25rem))`,
+              gridTemplateColumns: `${firstCol} repeat(${dataCols}, minmax(2.25rem, 2.25rem))`,
             }}
           >
             <div className="h-8" />
-            <div className="flex h-8 items-center justify-center text-xs font-semibold text-slate-500">
-              ε
-            </div>
-            {y.split("").map((ch, j) => (
+            {headers.map((label, j) => (
               <div
                 key={`y-${j}`}
                 className="flex h-8 items-center justify-center text-xs font-semibold text-slate-700"
               >
-                {ch}
+                {label === "ε" ? (
+                  <span className="text-slate-500">ε</span>
+                ) : (
+                  label
+                )}
               </div>
             ))}
-            {cells.map((row, i) => (
-              <Fragment key={`row-${i}`}>
-                <div className="flex h-9 items-center justify-center text-xs font-semibold text-slate-700">
-                  {i === 0 ? (
-                    <span className="text-slate-500">ε</span>
-                  ) : (
-                    x[i - 1]
-                  )}
-                </div>
-                {row.map((value, j) => (
+            {cells.map((row, i) => {
+              const label = table ? rowHeader(table, i) : i === 0 ? "ε" : x[i - 1];
+              return (
+                <Fragment key={`row-${i}`}>
                   <div
-                    key={`c-${i}-${j}`}
                     className={cn(
-                      "flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium tabular-nums transition-colors duration-150",
-                      cellClass(i, j, write, reads),
+                      "flex h-9 items-center justify-center font-semibold text-slate-700",
+                      customRowLabels
+                        ? "px-0.5 text-center text-[11px] leading-tight"
+                        : "text-xs",
                     )}
-                    title={`dp[${i}][${j}] = ${value}`}
                   >
-                    {value}
+                    {i === 0 || label === "ε" ? (
+                      <span className="text-slate-500">{label || "ε"}</span>
+                    ) : (
+                      label
+                    )}
                   </div>
-                ))}
-              </Fragment>
-            ))}
+                  {row.map((value, j) => (
+                    <div
+                      key={`c-${i}-${j}`}
+                      className={cn(
+                        "flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium tabular-nums transition-colors duration-150",
+                        cellClass(i, j, write, reads),
+                      )}
+                      title={`dp[${i}][${j}] = ${value}`}
+                    >
+                      {value}
+                    </div>
+                  ))}
+                </Fragment>
+              );
+            })}
           </div>
         )}
       </div>

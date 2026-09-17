@@ -38,6 +38,8 @@ import { LCS_CODE } from "@/lib/algorithms/lcs/code";
 import { generateLcsSteps } from "@/lib/algorithms/lcs/generateSteps";
 import { EDIT_DISTANCE_CODE } from "@/lib/algorithms/edit-distance/code";
 import { generateEditDistanceSteps } from "@/lib/algorithms/edit-distance/generateSteps";
+import { KNAPSACK_CODE } from "@/lib/algorithms/knapsack/code";
+import { generateKnapsackSteps } from "@/lib/algorithms/knapsack/generateSteps";
 import type { Graph } from "@/lib/algorithms/types";
 
 describe("merge sort code line ids", () => {
@@ -525,6 +527,50 @@ describe("edit distance code line ids", () => {
     const valid = new Set(EDIT_DISTANCE_CODE.python.map((l) => l.id));
     for (const step of generateEditDistanceSteps("cat", "cut")) {
       if (step.codeLineId === "match" || step.codeLineId === "mismatch") {
+        expect(valid.has(step.codeLineId)).toBe(true);
+        expect(step.dpTable?.write).toBeDefined();
+      }
+    }
+  });
+});
+
+describe("knapsack code line ids", () => {
+  const classic = [
+    { weight: 2, value: 3 },
+    { weight: 3, value: 4 },
+    { weight: 4, value: 5 },
+  ];
+
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof KNAPSACK_CODE) =>
+      new Set(KNAPSACK_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(KNAPSACK_CODE.python.map((l) => l.id));
+    const runs = [
+      generateKnapsackSteps(classic, 8),
+      generateKnapsackSteps([], 5),
+      generateKnapsackSteps(classic, 0),
+      generateKnapsackSteps([], 0),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+
+  it("every write step codeLineId is in the listings", () => {
+    const valid = new Set(KNAPSACK_CODE.python.map((l) => l.id));
+    for (const step of generateKnapsackSteps(classic, 5)) {
+      if (
+        step.codeLineId === "skip" ||
+        step.codeLineId === "take" ||
+        step.codeLineId === "choose"
+      ) {
         expect(valid.has(step.codeLineId)).toBe(true);
         expect(step.dpTable?.write).toBeDefined();
       }
