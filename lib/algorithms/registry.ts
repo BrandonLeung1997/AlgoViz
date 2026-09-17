@@ -4,6 +4,7 @@ import { mergeSortMeta } from "@/lib/algorithms/merge-sort/meta";
 import { quickSortMeta } from "@/lib/algorithms/quick-sort/meta";
 import { bubbleSortMeta } from "@/lib/algorithms/bubble-sort/meta";
 import { insertionSortMeta } from "@/lib/algorithms/insertion-sort/meta";
+import { selectionSortMeta } from "@/lib/algorithms/selection-sort/meta";
 import { bfsMeta } from "@/lib/algorithms/bfs/meta";
 import { dfsMeta } from "@/lib/algorithms/dfs/meta";
 import { dijkstraMeta } from "@/lib/algorithms/dijkstra/meta";
@@ -15,6 +16,7 @@ export const algorithms: AlgorithmMeta[] = [
   quickSortMeta,
   bubbleSortMeta,
   insertionSortMeta,
+  selectionSortMeta,
   binarySearchMeta,
   bfsMeta,
   dfsMeta,
