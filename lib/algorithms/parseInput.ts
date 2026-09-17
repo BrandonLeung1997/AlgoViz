@@ -2,6 +2,8 @@ import {
   MAX_ARRAY_LENGTH,
   MAX_GRAPH_NODES,
   MAX_STRING_LENGTH,
+  directedEdgeKey,
+  getDirectedEdgeWeight,
   getEdgeWeight,
   undirectedEdgeKey,
   type Graph,
@@ -82,12 +84,13 @@ function parseNodeId(
 
 function parseWeight(
   raw: string,
+  allowNegative = false,
 ): { ok: true; value: number } | { ok: false; error: string } {
   if (!/^-?\d+$/.test(raw)) {
     return { ok: false, error: `“${raw}” is not an integer weight.` };
   }
   const value = Number(raw);
-  if (value < 0) {
+  if (value < 0 && !allowNegative) {
     return { ok: false, error: NEGATIVE_WEIGHT_ERROR };
   }
   return { ok: true, value };
@@ -98,6 +101,8 @@ function finishGraph(
   extraNodes: number[] = [],
   weights?: Record<string, number>,
   keepWeights = false,
+  directedWeights?: Record<string, number>,
+  keepDirectedWeights = false,
 ): { ok: true; graph: Graph } | { ok: false; error: string } {
   const nodeSet = new Set<number>(extraNodes);
   for (const key of Object.keys(adj)) nodeSet.add(Number(key));
@@ -115,12 +120,16 @@ function finishGraph(
   }
   for (const n of nodeSet) adj[n] ??= [];
   const nodes = [...nodeSet].sort((a, b) => a - b);
-  const hasNonDefault =
+  const hasUndirected =
     keepWeights && weights && Object.values(weights).some((w) => w !== 1);
-  return {
-    ok: true,
-    graph: hasNonDefault ? { nodes, adj, weights } : { nodes, adj },
-  };
+  const hasDirected =
+    keepDirectedWeights &&
+    directedWeights &&
+    Object.values(directedWeights).some((w) => w !== 1);
+  const graph: Graph = { nodes, adj };
+  if (hasUndirected) graph.weights = weights;
+  if (hasDirected) graph.directedWeights = directedWeights;
+  return { ok: true, graph };
 }
 
 function setUndirectedWeight(
@@ -153,6 +162,7 @@ function addUndirected(
 
 function parseNeighborToken(
   token: string,
+  allowNegative = false,
 ):
   | { ok: true; id: number; weight: number; explicit: boolean }
   | { ok: false; error: string } {
@@ -164,7 +174,7 @@ function parseNeighborToken(
   if (!match) {
     return { ok: false, error: `“${token}” is not a neighbor like 1 or 1:4.` };
   }
-  const weight = parseWeight(match[2]!);
+  const weight = parseWeight(match[2]!, allowNegative);
   if (!weight.ok) return weight;
   return { ok: true, id: Number(match[1]), weight: weight.value, explicit: true };
 }
@@ -182,10 +192,26 @@ function addDirected(
   if (!aN.includes(b)) aN.push(b);
 }
 
+function setDirectedWeight(
+  weights: Record<string, number>,
+  from: number,
+  to: number,
+  weight: number,
+): { ok: false; error: string } | null {
+  const key = directedEdgeKey(from, to);
+  if (weights[key] !== undefined && weights[key] !== weight) {
+    return { ok: false, error: `Conflicting weights for edge ${key}.` };
+  }
+  weights[key] = weight;
+  return null;
+}
+
 function parseDirectedEdgeList(
   trimmed: string,
+  allowNegative = false,
 ): { ok: true; graph: Graph } | { ok: false; error: string } {
-  const edgeRe = /(\d+)\s*(?:->|>)\s*(\d+)/g;
+  const edgeRe =
+    /(\d+)\s*(?:->|>)\s*(\d+)(?:\s*(?::(-?\d+)|\((-?\d+)\)))?/g;
   const matches = [...trimmed.matchAll(edgeRe)];
   if (matches.length === 0) {
     return {
@@ -203,10 +229,24 @@ function parseDirectedEdgeList(
   }
 
   const adj: Record<number, number[]> = {};
+  const directedWeights: Record<string, number> = {};
+  let keepDirectedWeights = false;
   for (const match of matches) {
-    addDirected(adj, Number(match[1]), Number(match[2]));
+    const a = Number(match[1]);
+    const b = Number(match[2]);
+    const wRaw = match[3] ?? match[4];
+    let weight = 1;
+    if (wRaw !== undefined) {
+      const parsed = parseWeight(wRaw, allowNegative);
+      if (!parsed.ok) return parsed;
+      weight = parsed.value;
+      keepDirectedWeights = true;
+    }
+    addDirected(adj, a, b);
+    const conflict = setDirectedWeight(directedWeights, a, b, weight);
+    if (conflict) return conflict;
   }
-  return finishGraph(adj);
+  return finishGraph(adj, [], undefined, false, directedWeights, keepDirectedWeights);
 }
 
 function parseEdgeList(
@@ -232,7 +272,7 @@ function parseEdgeList(
     const wRaw = match[3] ?? match[4];
     let weight = 1;
     if (wRaw !== undefined) {
-      const parsed = parseWeight(wRaw);
+      const parsed = parseWeight(wRaw, false);
       if (!parsed.ok) return parsed;
       weight = parsed.value;
       keepWeights = true;
@@ -246,9 +286,11 @@ function parseEdgeList(
 
 function parseAdjacencyList(
   trimmed: string,
+  options: ParseGraphOptions = {},
 ): { ok: true; graph: Graph } | { ok: false; error: string } {
   const adj: Record<number, number[]> = {};
   const weights: Record<string, number> = {};
+  const directedWeights: Record<string, number> = {};
   let keepWeights = false;
   const entries = trimmed.split(/[;\n]+/).map((e) => e.trim()).filter(Boolean);
   for (const entry of entries) {
@@ -263,20 +305,33 @@ function parseAdjacencyList(
     const neighbors: number[] = [];
     if (right) {
       for (const token of right.split(/[\s,]+/).filter(Boolean)) {
-        const n = parseNeighborToken(token);
+        const n = parseNeighborToken(token, options.allowNegative);
         if (!n.ok) return n;
         if (n.explicit) keepWeights = true;
         if (!neighbors.includes(n.id)) neighbors.push(n.id);
-        const conflict = setUndirectedWeight(weights, node.id, n.id, n.weight);
-        if (conflict) return conflict;
+        if (options.directed) {
+          const conflict = setDirectedWeight(
+            directedWeights,
+            node.id,
+            n.id,
+            n.weight,
+          );
+          if (conflict) return conflict;
+        } else {
+          const conflict = setUndirectedWeight(weights, node.id, n.id, n.weight);
+          if (conflict) return conflict;
+        }
       }
     }
     adj[node.id] = neighbors;
   }
+  if (options.directed) {
+    return finishGraph(adj, [], undefined, false, directedWeights, keepWeights);
+  }
   return finishGraph(adj, [], weights, keepWeights);
 }
 
-export type ParseGraphOptions = { directed?: boolean };
+export type ParseGraphOptions = { directed?: boolean; allowNegative?: boolean };
 
 export function parseGraphInput(
   raw: string,
@@ -296,12 +351,12 @@ export function parseGraphInput(
       return { ok: true, graph: { nodes: [id], adj: { [id]: [] } } };
     }
     if (/\d+\s*(?:->|>)\s*\d+/.test(trimmed)) {
-      return parseDirectedEdgeList(trimmed);
+      return parseDirectedEdgeList(trimmed, options.allowNegative);
     }
     if (trimmed.includes(":")) {
-      return parseAdjacencyList(trimmed);
+      return parseAdjacencyList(trimmed, options);
     }
-    return parseDirectedEdgeList(trimmed);
+    return parseDirectedEdgeList(trimmed, options.allowNegative);
   }
 
   if (/^\d+$/.test(trimmed)) {
@@ -331,7 +386,8 @@ export function formatGraphInput(
     const seen = new Set<number>();
     for (const u of graph.nodes) {
       for (const v of graph.adj[u] ?? []) {
-        parts.push(`${u}>${v}`);
+        const weight = getDirectedEdgeWeight(graph, u, v);
+        parts.push(weight !== 1 ? `${u}>${v}:${weight}` : `${u}>${v}`);
         seen.add(u);
         seen.add(v);
       }
@@ -342,7 +398,13 @@ export function formatGraphInput(
     }
     if (isolated.length > 0) {
       return graph.nodes
-        .map((u) => `${u}:${(graph.adj[u] ?? []).join(",")}`)
+        .map((u) => {
+          const neighbors = (graph.adj[u] ?? []).map((v) => {
+            const weight = getDirectedEdgeWeight(graph, u, v);
+            return weight !== 1 ? `${v}:${weight}` : String(v);
+          });
+          return `${u}:${neighbors.join(",")}`;
+        })
         .join("; ");
     }
     return parts.join(", ");

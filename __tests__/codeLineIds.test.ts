@@ -21,6 +21,9 @@ import { DFS_CODE } from "@/lib/algorithms/dfs/code";
 import { generateDfsSteps } from "@/lib/algorithms/dfs/generateSteps";
 import { DIJKSTRA_CODE } from "@/lib/algorithms/dijkstra/code";
 import { generateDijkstraSteps } from "@/lib/algorithms/dijkstra/generateSteps";
+import { BELLMAN_FORD_CODE } from "@/lib/algorithms/bellman-ford/code";
+import { generateBellmanFordSteps } from "@/lib/algorithms/bellman-ford/generateSteps";
+import { DEFAULT_BELLMAN_FORD_GRAPH } from "@/lib/algorithms/randomGraph";
 import { TOPO_SORT_CODE } from "@/lib/algorithms/topological-sort/code";
 import { generateTopoSortSteps } from "@/lib/algorithms/topological-sort/generateSteps";
 import { LCS_CODE } from "@/lib/algorithms/lcs/code";
@@ -310,6 +313,40 @@ describe("dijkstra code line ids", () => {
         },
         0,
       ),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+});
+
+describe("bellman-ford code line ids", () => {
+  const tiny: Graph = {
+    nodes: [0, 1],
+    adj: { 0: [1], 1: [] },
+    directedWeights: { "0>1": 2 },
+  };
+  const cycle: Graph = {
+    nodes: [0, 1, 2],
+    adj: { 0: [1], 1: [2], 2: [1] },
+    directedWeights: { "0>1": 1, "1>2": -3, "2>1": 1 },
+  };
+
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof BELLMAN_FORD_CODE) =>
+      new Set(BELLMAN_FORD_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(BELLMAN_FORD_CODE.python.map((l) => l.id));
+    const runs = [
+      generateBellmanFordSteps(DEFAULT_BELLMAN_FORD_GRAPH, 0),
+      generateBellmanFordSteps(tiny, 0),
+      generateBellmanFordSteps(cycle, 0),
     ];
     for (const steps of runs) {
       for (const step of steps) {

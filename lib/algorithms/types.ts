@@ -24,6 +24,8 @@ export type Graph = {
   adj: Record<number, number[]>;
   /** Undirected key `${min}-${max}` → weight. Missing means 1. */
   weights?: Record<string, number>;
+  /** Directed key `${from}>${to}` → weight. Missing means 1. */
+  directedWeights?: Record<string, number>;
 };
 
 export type GraphFrame = {
@@ -44,8 +46,16 @@ export function undirectedEdgeKey(a: number, b: number): string {
   return a < b ? `${a}-${b}` : `${b}-${a}`;
 }
 
+export function directedEdgeKey(from: number, to: number): string {
+  return `${from}>${to}`;
+}
+
 export function getEdgeWeight(graph: Graph, u: number, v: number): number {
   return graph.weights?.[undirectedEdgeKey(u, v)] ?? 1;
+}
+
+export function getDirectedEdgeWeight(graph: Graph, u: number, v: number): number {
+  return graph.directedWeights?.[directedEdgeKey(u, v)] ?? 1;
 }
 
 export type DpCell = { i: number; j: number };

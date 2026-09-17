@@ -209,6 +209,72 @@ describe("parseGraphInput", () => {
     if (!again.ok) return;
     expect(again.graph.adj).toEqual(parsed.graph.adj);
   });
+
+  it("parses directed weighted edges including negatives when allowed", () => {
+    const result = parseGraphInput("0>1:4, 0->2:-2", {
+      directed: true,
+      allowNegative: true,
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.graph.nodes).toEqual([0, 1, 2]);
+    expect(result.graph.adj[0]).toEqual(expect.arrayContaining([1, 2]));
+    expect(result.graph.adj[1]).not.toContain(0);
+    expect(result.graph.adj[2]).not.toContain(0);
+    expect(result.graph.weights).toBeUndefined();
+    expect(result.graph.directedWeights).toEqual({ "0>1": 4, "0>2": -2 });
+  });
+
+  it("parses positive directed weights without allowNegative", () => {
+    const result = parseGraphInput("0>1:4, 1>2:1", { directed: true });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.graph.directedWeights).toEqual({ "0>1": 4, "1>2": 1 });
+    expect(result.graph.weights).toBeUndefined();
+  });
+
+  it("still rejects negatives in directed mode without allowNegative", () => {
+    const result = parseGraphInput("0>1:-2", { directed: true });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.toLowerCase()).toMatch(/negative/);
+  });
+
+  it("formats directed weighted graphs and round-trips negatives", () => {
+    const parsed = parseGraphInput("0>1:4, 0>2:-2", {
+      directed: true,
+      allowNegative: true,
+    });
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const formatted = formatGraphInput(parsed.graph, { directed: true });
+    expect(formatted).toMatch(/0>1:4/);
+    expect(formatted).toMatch(/0>2:-2/);
+    expect(formatted).not.toMatch(/\d-\d/);
+    const again = parseGraphInput(formatted, {
+      directed: true,
+      allowNegative: true,
+    });
+    expect(again.ok).toBe(true);
+    if (!again.ok) return;
+    expect(again.graph.adj).toEqual(parsed.graph.adj);
+    expect(again.graph.directedWeights).toEqual(parsed.graph.directedWeights);
+  });
+
+  it("parses directed weighted adjacency lists with negatives", () => {
+    const result = parseGraphInput("0:1:4,2:-2; 1:; 2:", {
+      directed: true,
+      allowNegative: true,
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.graph.adj[0]).toEqual([1, 2]);
+    expect(result.graph.adj[1]).toEqual([]);
+    expect(result.graph.adj[1]).not.toContain(0);
+    expect(result.graph.weights).toBeUndefined();
+    expect(result.graph.directedWeights?.["0>1"]).toBe(4);
+    expect(result.graph.directedWeights?.["0>2"]).toBe(-2);
+  });
 });
 
 describe("parseStringInput", () => {

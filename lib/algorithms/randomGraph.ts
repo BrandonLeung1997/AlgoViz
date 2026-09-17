@@ -133,3 +133,35 @@ export function randomDag(nodeCount = 7): Graph {
 
   return { nodes, adj };
 }
+
+/** Directed teaching graph: a negative edge makes 0→1→2 cheaper than 0→2. */
+export const DEFAULT_BELLMAN_FORD_GRAPH: Graph = {
+  nodes: [0, 1, 2, 3],
+  adj: {
+    0: [1, 2],
+    1: [2, 3],
+    2: [3],
+    3: [],
+  },
+  directedWeights: {
+    "0>1": 4,
+    "0>2": 5,
+    "1>2": -3,
+    "1>3": 6,
+    "2>3": 1,
+  },
+};
+
+/** Small directed weighted graph. DAG-shaped so the default randomize has no negative cycle. */
+export function randomDirectedWeightedGraph(nodeCount = 6): Graph {
+  const graph = randomDag(Math.min(Math.max(nodeCount, 2), 8));
+  const directedWeights: Record<string, number> = {};
+  for (const u of graph.nodes) {
+    for (const v of graph.adj[u] ?? []) {
+      let w = Math.floor(Math.random() * 13) - 5;
+      if (w === 0) w = 1;
+      directedWeights[`${u}>${v}`] = w;
+    }
+  }
+  return { ...graph, directedWeights };
+}

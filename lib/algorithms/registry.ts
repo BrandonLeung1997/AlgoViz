@@ -10,6 +10,7 @@ import { heapSortMeta } from "@/lib/algorithms/heap-sort/meta";
 import { bfsMeta } from "@/lib/algorithms/bfs/meta";
 import { dfsMeta } from "@/lib/algorithms/dfs/meta";
 import { dijkstraMeta } from "@/lib/algorithms/dijkstra/meta";
+import { bellmanFordMeta } from "@/lib/algorithms/bellman-ford/meta";
 import { topologicalSortMeta } from "@/lib/algorithms/topological-sort/meta";
 import { lcsMeta } from "@/lib/algorithms/lcs/meta";
 
@@ -25,6 +26,7 @@ export const algorithms: AlgorithmMeta[] = [
   bfsMeta,
   dfsMeta,
   dijkstraMeta,
+  bellmanFordMeta,
   topologicalSortMeta,
   lcsMeta,
 ];
