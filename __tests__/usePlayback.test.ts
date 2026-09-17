@@ -9,6 +9,7 @@ import { generateBfsSteps } from "@/lib/algorithms/bfs/generateSteps";
 import { generateDfsSteps } from "@/lib/algorithms/dfs/generateSteps";
 import { generateDijkstraSteps } from "@/lib/algorithms/dijkstra/generateSteps";
 import { generateTopoSortSteps } from "@/lib/algorithms/topological-sort/generateSteps";
+import { generateLcsSteps } from "@/lib/algorithms/lcs/generateSteps";
 
 describe("usePlayback", () => {
   beforeEach(() => {
@@ -175,5 +176,33 @@ describe("usePlayback", () => {
     expect(result.current.steps.at(-1)?.graph?.path?.at(-1)).toBe(3);
     act(() => result.current.stepForward());
     expect(result.current.index).toBe(1);
+  });
+
+  it("plays an lcs timeline", () => {
+    const generate = () => generateLcsSteps("ABCD", "ACBD");
+    const { result } = renderHook(() => usePlayback(generate, [0]));
+    expect(result.current.steps.length).toBeGreaterThan(0);
+    expect(result.current.steps.at(-1)?.codeLineId).toBe("done");
+    expect(result.current.steps.at(-1)?.dpTable?.reconstructed?.length).toBe(3);
+    act(() => result.current.stepForward());
+    expect(result.current.index).toBe(1);
+  });
+
+  it("regenerates LCS steps when generateSteps identity changes", () => {
+    const { result, rerender } = renderHook(
+      ({ y }: { y: string }) => {
+        const generate = useCallback(() => generateLcsSteps("ABCD", y), [y]);
+        return usePlayback(generate, [0]);
+      },
+      { initialProps: { y: "ACBD" } },
+    );
+    expect(result.current.steps.at(-1)?.dpTable?.reconstructed?.length).toBe(3);
+    act(() => result.current.stepForward());
+    expect(result.current.index).toBeGreaterThan(0);
+
+    rerender({ y: "XYZ" });
+    expect(result.current.index).toBe(0);
+    expect(result.current.playing).toBe(false);
+    expect(result.current.steps.at(-1)?.dpTable?.reconstructed).toBe("");
   });
 });

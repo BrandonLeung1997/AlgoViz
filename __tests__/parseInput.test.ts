@@ -3,9 +3,11 @@ import {
   parseArrayInput,
   parseTargetInput,
   parseGraphInput,
+  parseStringInput,
   formatGraphInput,
   MAX_ARRAY_LENGTH,
   MAX_GRAPH_NODES,
+  MAX_STRING_LENGTH,
 } from "@/lib/algorithms/parseInput";
 
 describe("parseArrayInput", () => {
@@ -206,5 +208,38 @@ describe("parseGraphInput", () => {
     expect(again.ok).toBe(true);
     if (!again.ok) return;
     expect(again.graph.adj).toEqual(parsed.graph.adj);
+  });
+});
+
+describe("parseStringInput", () => {
+  it("accepts an empty string as a valid LCS sequence", () => {
+    expect(parseStringInput("")).toEqual({ ok: true, value: "" });
+  });
+
+  it("parses letters and digits and trims outer whitespace", () => {
+    expect(parseStringInput(" ABCD ")).toEqual({ ok: true, value: "ABCD" });
+    expect(parseStringInput("A1b2")).toEqual({ ok: true, value: "A1b2" });
+  });
+
+  it("rejects whitespace-only junk", () => {
+    const result = parseStringInput("   ");
+    expect(result.ok).toBe(false);
+  });
+
+  it("rejects punctuation, inner spaces, and other junk", () => {
+    expect(parseStringInput("A B").ok).toBe(false);
+    expect(parseStringInput("AB-CD").ok).toBe(false);
+    expect(parseStringInput("hello!").ok).toBe(false);
+  });
+
+  it("rejects strings longer than MAX_STRING_LENGTH", () => {
+    const raw = "A".repeat(MAX_STRING_LENGTH + 1);
+    const result = parseStringInput(raw);
+    expect(result.ok).toBe(false);
+  });
+
+  it("accepts a string at the length cap", () => {
+    const raw = "A".repeat(MAX_STRING_LENGTH);
+    expect(parseStringInput(raw)).toEqual({ ok: true, value: raw });
   });
 });

@@ -48,11 +48,23 @@ export function getEdgeWeight(graph: Graph, u: number, v: number): number {
   return graph.weights?.[undirectedEdgeKey(u, v)] ?? 1;
 }
 
+export type DpCell = { i: number; j: number };
+
+export type DpTableFrame = {
+  x: string;
+  y: string;
+  cells: number[][];
+  write?: DpCell;
+  reads?: DpCell[];
+  reconstructed?: string;
+};
+
 export type Step = {
   array: number[];
   highlights: Highlight[];
   range?: { low: number; mid?: number; high: number };
   graph?: GraphFrame;
+  dpTable?: DpTableFrame;
   codeLineId: string;
   explanation: string;
 };
@@ -65,7 +77,7 @@ export type ComplexityCase = {
   space: string;
 };
 
-export type AlgorithmFamily = "sorting" | "searching" | "graphs";
+export type AlgorithmFamily = "sorting" | "searching" | "graphs" | "dp";
 
 export type AlgorithmMeta = {
   slug: string;
@@ -82,3 +94,4 @@ export type PlaybackSpeed = 0.5 | 1 | 1.5 | 2 | 3 | 4;
 export const BASE_STEP_MS = 700;
 export const MAX_ARRAY_LENGTH = 16;
 export const MAX_GRAPH_NODES = 12;
+export const MAX_STRING_LENGTH = 10;

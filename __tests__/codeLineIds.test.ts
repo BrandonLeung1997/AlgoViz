@@ -13,6 +13,8 @@ import { DIJKSTRA_CODE } from "@/lib/algorithms/dijkstra/code";
 import { generateDijkstraSteps } from "@/lib/algorithms/dijkstra/generateSteps";
 import { TOPO_SORT_CODE } from "@/lib/algorithms/topological-sort/code";
 import { generateTopoSortSteps } from "@/lib/algorithms/topological-sort/generateSteps";
+import { LCS_CODE } from "@/lib/algorithms/lcs/code";
+import { generateLcsSteps } from "@/lib/algorithms/lcs/generateSteps";
 import type { Graph } from "@/lib/algorithms/types";
 
 describe("merge sort code line ids", () => {
@@ -209,6 +211,41 @@ describe("topological sort code line ids", () => {
     for (const steps of runs) {
       for (const step of steps) {
         expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+});
+
+describe("lcs code line ids", () => {
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof LCS_CODE) =>
+      new Set(LCS_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(LCS_CODE.python.map((l) => l.id));
+    const runs = [
+      generateLcsSteps("ABCD", "ACBD"),
+      generateLcsSteps("", ""),
+      generateLcsSteps("ABC", ""),
+      generateLcsSteps("ABC", "XYZ"),
+      generateLcsSteps("AGGTAB", "GXTXAYB"),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+
+  it("every write step codeLineId is in the listings", () => {
+    const valid = new Set(LCS_CODE.python.map((l) => l.id));
+    for (const step of generateLcsSteps("ABCD", "ACBD")) {
+      if (step.codeLineId === "match" || step.codeLineId === "skip") {
+        expect(valid.has(step.codeLineId)).toBe(true);
+        expect(step.dpTable?.write).toBeDefined();
       }
     }
   });

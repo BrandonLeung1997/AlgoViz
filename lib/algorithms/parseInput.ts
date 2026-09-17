@@ -1,6 +1,7 @@
 import {
   MAX_ARRAY_LENGTH,
   MAX_GRAPH_NODES,
+  MAX_STRING_LENGTH,
   getEdgeWeight,
   undirectedEdgeKey,
   type Graph,
@@ -9,7 +10,29 @@ import {
 const NEGATIVE_WEIGHT_ERROR =
   "Negative edge weights are not allowed (Dijkstra needs non-negative weights).";
 
-export { MAX_ARRAY_LENGTH, MAX_GRAPH_NODES };
+export { MAX_ARRAY_LENGTH, MAX_GRAPH_NODES, MAX_STRING_LENGTH };
+
+export function parseStringInput(
+  raw: string,
+): { ok: true; value: string } | { ok: false; error: string } {
+  if (raw.length > 0 && raw.trim().length === 0) {
+    return { ok: false, error: "Use letters and digits only (no spaces)." };
+  }
+  const value = raw.trim();
+  if (value.length > MAX_STRING_LENGTH) {
+    return {
+      ok: false,
+      error: `Use at most ${MAX_STRING_LENGTH} characters.`,
+    };
+  }
+  if (!/^[A-Za-z0-9]*$/.test(value)) {
+    return {
+      ok: false,
+      error: "Use letters and digits only (A–Z, a–z, 0–9).",
+    };
+  }
+  return { ok: true, value };
+}
 
 export function parseArrayInput(
   raw: string,
