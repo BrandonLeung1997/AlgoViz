@@ -3,6 +3,7 @@ import {
   parseArrayInput,
   parseHeapInput,
   parseListInput,
+  parseMergeListInput,
   parseCycleIndex,
   parseTargetInput,
   parseGraphInput,
@@ -75,6 +76,28 @@ describe("parseListInput", () => {
     if (!result.ok) {
       expect(result.error).toContain(String(MAX_LIST_LENGTH));
     }
+  });
+});
+
+describe("parseMergeListInput", () => {
+  it("treats empty and whitespace as an empty list", () => {
+    expect(parseMergeListInput("")).toEqual({ ok: true, values: [] });
+    expect(parseMergeListInput("   ")).toEqual({ ok: true, values: [] });
+  });
+
+  it("parses a list-sized array", () => {
+    expect(parseMergeListInput("1, 3, 5")).toEqual({
+      ok: true,
+      values: [1, 3, 5],
+    });
+  });
+
+  it("still rejects a list longer than MAX_LIST_LENGTH", () => {
+    const raw = Array.from({ length: MAX_LIST_LENGTH + 1 }, (_, i) => i + 1).join(
+      ",",
+    );
+    const result = parseMergeListInput(raw);
+    expect(result.ok).toBe(false);
   });
 });
 

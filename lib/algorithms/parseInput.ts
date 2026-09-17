@@ -96,6 +96,13 @@ export function parseListInput(
   return parsed;
 }
 
+export function parseMergeListInput(
+  raw: string,
+): { ok: true; values: number[] } | { ok: false; error: string } {
+  if (raw.trim() === "") return { ok: true, values: [] };
+  return parseListInput(raw);
+}
+
 export function parseCycleIndex(
   raw: string,
   length: number,

@@ -52,6 +52,8 @@ import { REVERSE_LIST_CODE } from "@/lib/algorithms/reverse-list/code";
 import { generateReverseListSteps } from "@/lib/algorithms/reverse-list/generateSteps";
 import { CYCLE_DETECTION_CODE } from "@/lib/algorithms/cycle-detection/code";
 import { generateCycleDetectionSteps } from "@/lib/algorithms/cycle-detection/generateSteps";
+import { MERGE_LISTS_CODE } from "@/lib/algorithms/merge-lists/code";
+import { generateMergeListsSteps } from "@/lib/algorithms/merge-lists/generateSteps";
 import type { Graph } from "@/lib/algorithms/types";
 
 describe("merge sort code line ids", () => {
@@ -744,6 +746,31 @@ describe("cycle detection code line ids", () => {
       generateCycleDetectionSteps([7], 0),
       generateCycleDetectionSteps([7], null),
       generateCycleDetectionSteps([], null),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+});
+
+describe("merge lists code line ids", () => {
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof MERGE_LISTS_CODE) =>
+      new Set(MERGE_LISTS_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(MERGE_LISTS_CODE.python.map((l) => l.id));
+    const runs = [
+      generateMergeListsSteps([1, 3, 5], [2, 4]),
+      generateMergeListsSteps([], [2, 4]),
+      generateMergeListsSteps([1, 3], []),
+      generateMergeListsSteps([], []),
+      generateMergeListsSteps([1, 1], [1, 2]),
     ];
     for (const steps of runs) {
       for (const step of steps) {

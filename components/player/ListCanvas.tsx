@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import type { ListNodeFrame, Step } from "@/lib/algorithms/types";
+import { walkIds } from "@/lib/algorithms/reverse-list/listFrame";
 import { cn } from "@/lib/utils";
 
 const NODE_W = 56;
@@ -14,7 +15,17 @@ const NULL_UNDER = 28;
 const CURVE_BASE = 36;
 const SELF_LOOP = 34;
 
-const POINTER_ORDER = ["head", "slow", "fast", "prev", "curr", "next"] as const;
+const POINTER_ORDER = [
+  "head",
+  "slow",
+  "fast",
+  "prev",
+  "curr",
+  "next",
+  "p",
+  "q",
+  "tail",
+] as const;
 
 const POINTER_LABEL_CLASS: Record<string, string> = {
   curr: "text-amber-700",
@@ -23,6 +34,9 @@ const POINTER_LABEL_CLASS: Record<string, string> = {
   head: "text-sky-700",
   slow: "text-sky-600",
   fast: "text-amber-700",
+  p: "text-sky-600",
+  q: "text-amber-700",
+  tail: "text-green-700",
 };
 
 function pointersOn(
@@ -50,9 +64,12 @@ function nodeFill(
   reversed: Set<number>,
 ): string {
   if (roles.includes("slow") && roles.includes("fast")) return "#f43f5e";
-  if (roles.includes("fast") || roles.includes("curr")) return "#fbbf24";
-  if (roles.includes("slow")) return "#38bdf8";
-  if (roles.includes("next")) return "#22c55e";
+  if (roles.includes("p") && roles.includes("q")) return "#f43f5e";
+  if (roles.includes("fast") || roles.includes("curr") || roles.includes("q")) {
+    return "#fbbf24";
+  }
+  if (roles.includes("slow") || roles.includes("p")) return "#38bdf8";
+  if (roles.includes("next") || roles.includes("tail")) return "#22c55e";
   if (roles.includes("prev")) return "#64748b";
   if (reversed.has(id)) return "#0369a1";
   return "#334155";
@@ -62,7 +79,9 @@ function labelFill(roles: string[]): string {
   if (
     roles.includes("curr") ||
     roles.includes("fast") ||
-    roles.includes("slow")
+    roles.includes("slow") ||
+    roles.includes("p") ||
+    roles.includes("q")
   ) {
     return "#0f172a";
   }
@@ -113,12 +132,67 @@ export type ListCanvasProps = {
 
 export function ListCanvas({ step }: ListCanvasProps) {
   const list = step?.list;
-  const nodes = [...(list?.nodes ?? [])].sort((a, b) => a.id - b.id);
+  const allNodes = list?.nodes ?? [];
   const pointers = list?.pointers ?? {};
   const reversed = new Set(list?.highlightIds ?? []);
+  const merge = "p" in pointers && "q" in pointers;
+  const tortoise = "slow" in pointers || "fast" in pointers;
+
+  if (merge) {
+    const byId = new Map(allNodes.map((node) => [node.id, node]));
+    const pick = (start: number | null) =>
+      walkIds(allNodes, start)
+        .map((id) => byId.get(id))
+        .filter((node): node is ListNodeFrame => node != null);
+    return (
+      <div>
+        <div
+          className="space-y-3 overflow-x-auto rounded-lg border border-slate-200 bg-white p-3"
+          aria-label="Linked list visualization"
+        >
+          <ChainRow
+            label="List A"
+            nodes={pick(pointers.p ?? null)}
+            pointers={pointers}
+            reversed={reversed}
+            markerId="a"
+          />
+          <ChainRow
+            label="List B"
+            nodes={pick(pointers.q ?? null)}
+            pointers={pointers}
+            reversed={reversed}
+            markerId="b"
+          />
+          <ChainRow
+            label="Merged"
+            nodes={pick(list?.head ?? null)}
+            pointers={pointers}
+            reversed={reversed}
+            markerId="out"
+          />
+        </div>
+        {step?.array.length ? (
+          <p className="mt-2 text-center text-xs tabular-nums text-slate-500">
+            Values: {step.array.join(", ")}
+          </p>
+        ) : null}
+        <p className="mt-1 text-center text-xs text-slate-500">
+          <span className="font-semibold text-sky-600">p</span>
+          {" · "}
+          <span className="font-semibold text-amber-600">q</span>
+          {" · "}
+          <span className="font-semibold text-green-700">tail</span>
+          {" · "}
+          <span className="font-semibold text-sky-700">merged</span>
+        </p>
+      </div>
+    );
+  }
+
+  const nodes = [...allNodes].sort((a, b) => a.id - b.id);
   const n = nodes.length;
   const indexOf = new Map(nodes.map((node, i) => [node.id, i]));
-  const tortoise = "slow" in pointers || "fast" in pointers;
 
   const edges = nodes.filter(
     (node) => node.next !== null && indexOf.has(node.next),
@@ -154,82 +228,18 @@ export function ListCanvas({ step }: ListCanvasProps) {
         className="overflow-x-auto rounded-lg border border-slate-200 bg-white p-3"
         aria-label="Linked list visualization"
       >
-        <div
-          className="relative mx-auto"
-          style={{ width, height, minWidth: width }}
-        >
-          <svg
-            className="pointer-events-none absolute inset-0"
-            width={width}
-            height={height}
-            viewBox={`0 0 ${width} ${height}`}
-            aria-hidden
-          >
-            <defs>
-              <marker
-                id="list-arrow"
-                markerWidth="8"
-                markerHeight="8"
-                refX="6"
-                refY="4"
-                orient="auto"
-              >
-                <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
-              </marker>
-              <marker
-                id="list-arrow-back"
-                markerWidth="8"
-                markerHeight="8"
-                refX="6"
-                refY="4"
-                orient="auto"
-              >
-                <path d="M0,0 L8,4 L0,8 Z" fill="#0ea5e9" />
-              </marker>
-            </defs>
-            {edges.map((node) => {
-              const from = indexOf.get(node.id)!;
-              const to = indexOf.get(node.next!)!;
-              const back = isBackEdge(from, to);
-              return (
-                <path
-                  key={`e-${node.id}`}
-                  data-kind={back ? "back" : "forward"}
-                  d={arrowPath(from, to, arrowY)}
-                  fill="none"
-                  stroke={back ? "#0ea5e9" : "#94a3b8"}
-                  strokeWidth={2}
-                  markerEnd={back ? "url(#list-arrow-back)" : "url(#list-arrow)"}
-                />
-              );
-            })}
-            {nodes.map((node, i) =>
-              node.next === null ? (
-                <g key={`null-${node.id}`}>
-                  <line
-                    x1={slotCenterX(i)}
-                    y1={nodeY + NODE_H}
-                    x2={slotCenterX(i)}
-                    y2={nodeY + NODE_H + 8}
-                    stroke="#94a3b8"
-                    strokeWidth={2}
-                    markerEnd="url(#list-arrow)"
-                  />
-                </g>
-              ) : null,
-            )}
-          </svg>
-          {nodes.map((node, i) => (
-            <NodeSlot
-              key={node.id}
-              node={node}
-              roles={pointersOn(node.id, pointers)}
-              reversed={reversed}
-              x={PAD_X + i * (NODE_W + GAP)}
-              y={nodeY}
-            />
-          ))}
-        </div>
+        <ChainSvg
+          nodes={nodes}
+          pointers={pointers}
+          reversed={reversed}
+          width={width}
+          height={height}
+          nodeY={nodeY}
+          arrowY={arrowY}
+          edges={edges}
+          indexOf={indexOf}
+          markerId="list"
+        />
       </div>
       {step?.array.length ? (
         <p className="mt-2 text-center text-xs tabular-nums text-slate-500">
@@ -258,6 +268,161 @@ export function ListCanvas({ step }: ListCanvasProps) {
         </p>
       )}
     </div>
+  );
+}
+
+function ChainRow({
+  label,
+  nodes,
+  pointers,
+  reversed,
+  markerId,
+}: {
+  label: string;
+  nodes: ListNodeFrame[];
+  pointers: Record<string, number | null>;
+  reversed: Set<number>;
+  markerId: string;
+}) {
+  const n = nodes.length;
+  const indexOf = new Map(nodes.map((node, i) => [node.id, i]));
+  const onRow = new Set(nodes.map((node) => node.id));
+  const edges = nodes.filter(
+    (node) => node.next !== null && onRow.has(node.next),
+  );
+  const extraBottom = NULL_UNDER;
+  const width = PAD_X * 2 + Math.max(n, 1) * NODE_W + Math.max(0, n - 1) * GAP;
+  const height = LABEL_H + NODE_H + extraBottom + 8;
+  const nodeY = LABEL_H;
+  const arrowY = nodeY + NODE_H / 2;
+
+  return (
+    <div>
+      <p className="mb-1 text-xs font-semibold text-slate-600">{label}</p>
+      {n === 0 ? (
+        <p className="py-4 text-center text-sm text-slate-500">empty</p>
+      ) : (
+        <div
+          className="relative mx-auto"
+          style={{ width, height, minWidth: width }}
+        >
+          <ChainSvg
+            nodes={nodes}
+            pointers={pointers}
+            reversed={reversed}
+            width={width}
+            height={height}
+            nodeY={nodeY}
+            arrowY={arrowY}
+            edges={edges}
+            indexOf={indexOf}
+            markerId={markerId}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ChainSvg({
+  nodes,
+  pointers,
+  reversed,
+  width,
+  height,
+  nodeY,
+  arrowY,
+  edges,
+  indexOf,
+  markerId,
+}: {
+  nodes: ListNodeFrame[];
+  pointers: Record<string, number | null>;
+  reversed: Set<number>;
+  width: number;
+  height: number;
+  nodeY: number;
+  arrowY: number;
+  edges: ListNodeFrame[];
+  indexOf: Map<number, number>;
+  markerId: string;
+}) {
+  const fwd = `${markerId}-arrow`;
+  const back = `${markerId}-arrow-back`;
+  return (
+    <>
+      <svg
+        className="pointer-events-none absolute inset-0"
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+        aria-hidden
+      >
+        <defs>
+          <marker
+            id={fwd}
+            markerWidth="8"
+            markerHeight="8"
+            refX="6"
+            refY="4"
+            orient="auto"
+          >
+            <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8" />
+          </marker>
+          <marker
+            id={back}
+            markerWidth="8"
+            markerHeight="8"
+            refX="6"
+            refY="4"
+            orient="auto"
+          >
+            <path d="M0,0 L8,4 L0,8 Z" fill="#0ea5e9" />
+          </marker>
+        </defs>
+        {edges.map((node) => {
+          const from = indexOf.get(node.id)!;
+          const to = indexOf.get(node.next!)!;
+          const isBack = isBackEdge(from, to);
+          return (
+            <path
+              key={`e-${node.id}`}
+              data-kind={isBack ? "back" : "forward"}
+              d={arrowPath(from, to, arrowY)}
+              fill="none"
+              stroke={isBack ? "#0ea5e9" : "#94a3b8"}
+              strokeWidth={2}
+              markerEnd={isBack ? `url(#${back})` : `url(#${fwd})`}
+            />
+          );
+        })}
+        {nodes.map((node, i) =>
+          node.next === null ? (
+            <g key={`null-${node.id}`}>
+              <line
+                x1={slotCenterX(i)}
+                y1={nodeY + NODE_H}
+                x2={slotCenterX(i)}
+                y2={nodeY + NODE_H + 8}
+                stroke="#94a3b8"
+                strokeWidth={2}
+                markerEnd={`url(#${fwd})`}
+              />
+            </g>
+          ) : null,
+        )}
+      </svg>
+      {nodes.map((node, i) => (
+        <NodeSlot
+          key={node.id}
+          node={node}
+          roles={pointersOn(node.id, pointers)}
+          reversed={reversed}
+          x={PAD_X + i * (NODE_W + GAP)}
+          y={nodeY}
+        />
+      ))}
+    </>
   );
 }
 

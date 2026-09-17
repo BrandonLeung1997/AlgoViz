@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { ListCanvas } from "@/components/player/ListCanvas";
 import { generateReverseListSteps } from "@/lib/algorithms/reverse-list/generateSteps";
 import { generateCycleDetectionSteps } from "@/lib/algorithms/cycle-detection/generateSteps";
+import { generateMergeListsSteps } from "@/lib/algorithms/merge-lists/generateSteps";
 import type { Step } from "@/lib/algorithms/types";
 
 afterEach(() => {
@@ -73,5 +74,27 @@ describe("ListCanvas", () => {
     expect(
       container.querySelectorAll('path[data-kind="forward"]').length,
     ).toBe(3);
+  });
+
+  it("labels List A, List B, and Merged for a merge step", () => {
+    const step = generateMergeListsSteps([1, 3, 5], [2, 4])[0];
+    render(<ListCanvas step={step} />);
+    expect(screen.getByText("List A")).toBeInTheDocument();
+    expect(screen.getByText("List B")).toBeInTheDocument();
+    expect(screen.getByText("Merged")).toBeInTheDocument();
+  });
+
+  it("does not show merge row labels for reverse-list", () => {
+    const step = generateReverseListSteps([1, 2, 3, 4])[0];
+    render(<ListCanvas step={step} />);
+    expect(screen.queryByText("List A")).not.toBeInTheDocument();
+    expect(screen.queryByText("Merged")).not.toBeInTheDocument();
+  });
+
+  it("does not show merge row labels for cycle detection", () => {
+    const step = generateCycleDetectionSteps([1, 2, 3, 4], 1)[0];
+    render(<ListCanvas step={step} />);
+    expect(screen.queryByText("List A")).not.toBeInTheDocument();
+    expect(screen.queryByText("Merged")).not.toBeInTheDocument();
   });
 });

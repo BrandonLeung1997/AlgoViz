@@ -29,3 +29,11 @@ export function randomListArray(): number[] {
   const n = Math.min(4 + Math.floor(Math.random() * 4), MAX_LIST_LENGTH);
   return shuffledPool(n);
 }
+
+export function randomSortedListPair(): [number[], number[]] {
+  const nA = 2 + Math.floor(Math.random() * 3);
+  const nB = Math.min(2 + Math.floor(Math.random() * 3), MAX_LIST_LENGTH - nA);
+  const pool = shuffledPool(nA + nB);
+  const sortN = (xs: number[]) => [...xs].sort((x, y) => x - y);
+  return [sortN(pool.slice(0, nA)), sortN(pool.slice(nA))];
+}
