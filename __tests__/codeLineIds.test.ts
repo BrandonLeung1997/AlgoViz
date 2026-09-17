@@ -7,6 +7,8 @@ import { QUICK_SORT_CODE } from "@/lib/algorithms/quick-sort/code";
 import { generateQuickSortSteps } from "@/lib/algorithms/quick-sort/generateSteps";
 import { BFS_CODE } from "@/lib/algorithms/bfs/code";
 import { generateBfsSteps } from "@/lib/algorithms/bfs/generateSteps";
+import { DFS_CODE } from "@/lib/algorithms/dfs/code";
+import { generateDfsSteps } from "@/lib/algorithms/dfs/generateSteps";
 import type { Graph } from "@/lib/algorithms/types";
 
 describe("merge sort code line ids", () => {
@@ -93,6 +95,40 @@ describe("bfs code line ids", () => {
       generateBfsSteps(demo, 0),
       generateBfsSteps({ nodes: [0], adj: { 0: [] } }, 0),
       generateBfsSteps(
+        {
+          nodes: [0, 1, 2],
+          adj: { 0: [1], 1: [0], 2: [] },
+        },
+        0,
+      ),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+});
+
+describe("dfs code line ids", () => {
+  const demo: Graph = {
+    nodes: [0, 1, 2, 3],
+    adj: { 0: [1, 2], 1: [0, 3], 2: [0], 3: [1] },
+  };
+
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof DFS_CODE) =>
+      new Set(DFS_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(DFS_CODE.python.map((l) => l.id));
+    const runs = [
+      generateDfsSteps(demo, 0),
+      generateDfsSteps({ nodes: [0], adj: { 0: [] } }, 0),
+      generateDfsSteps(
         {
           nodes: [0, 1, 2],
           adj: { 0: [1], 1: [0], 2: [] },

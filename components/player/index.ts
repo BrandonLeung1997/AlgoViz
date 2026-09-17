@@ -11,4 +11,5 @@ export { MergeSortStudio } from "./MergeSortStudio";
 export { BinarySearchStudio } from "./BinarySearchStudio";
 export { QuickSortStudio } from "./QuickSortStudio";
 export { BfsStudio } from "./BfsStudio";
+export { DfsStudio } from "./DfsStudio";
 export { GraphCanvas, type GraphCanvasProps } from "./GraphCanvas";

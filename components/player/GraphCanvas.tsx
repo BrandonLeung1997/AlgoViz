@@ -56,9 +56,13 @@ function nodeLabelColor(id: number, graph: GraphFrame): string {
 
 export type GraphCanvasProps = {
   step: Step | undefined;
+  frontierLabel?: string;
 };
 
-export function GraphCanvas({ step }: GraphCanvasProps) {
+export function GraphCanvas({
+  step,
+  frontierLabel = "Queue",
+}: GraphCanvasProps) {
   const graph = step?.graph;
   const nodes = graph?.nodes ?? [];
   const positions = layout(nodes);
@@ -132,7 +136,7 @@ export function GraphCanvas({ step }: GraphCanvasProps) {
       </div>
       <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-600">
         <span>
-          Queue:{" "}
+          {frontierLabel}:{" "}
           <span className="font-mono font-medium text-slate-800">
             [{(graph?.frontier ?? []).join(", ")}]
           </span>

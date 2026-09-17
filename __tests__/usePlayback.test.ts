@@ -6,6 +6,7 @@ import { generateMergeSortSteps } from "@/lib/algorithms/merge-sort/generateStep
 import { generateBinarySearchSteps } from "@/lib/algorithms/binary-search/generateSteps";
 import { generateQuickSortSteps } from "@/lib/algorithms/quick-sort/generateSteps";
 import { generateBfsSteps } from "@/lib/algorithms/bfs/generateSteps";
+import { generateDfsSteps } from "@/lib/algorithms/dfs/generateSteps";
 
 describe("usePlayback", () => {
   beforeEach(() => {
@@ -122,6 +123,20 @@ describe("usePlayback", () => {
       adj: { 0: [1], 1: [0, 2], 2: [1] },
     };
     const generate = () => generateBfsSteps(graph, 0);
+    const { result } = renderHook(() => usePlayback(generate, [0]));
+    expect(result.current.steps.length).toBeGreaterThan(0);
+    expect(result.current.steps.at(-1)?.codeLineId).toBe("done");
+    expect(result.current.steps.at(-1)?.graph?.visited).toEqual([0, 1, 2]);
+    act(() => result.current.stepForward());
+    expect(result.current.index).toBe(1);
+  });
+
+  it("plays a dfs timeline", () => {
+    const graph = {
+      nodes: [0, 1, 2],
+      adj: { 0: [1], 1: [0, 2], 2: [1] },
+    };
+    const generate = () => generateDfsSteps(graph, 0);
     const { result } = renderHook(() => usePlayback(generate, [0]));
     expect(result.current.steps.length).toBeGreaterThan(0);
     expect(result.current.steps.at(-1)?.codeLineId).toBe("done");
