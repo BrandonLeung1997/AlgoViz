@@ -30,5 +30,7 @@ export { HeapifyStudio } from "./HeapifyStudio";
 export { HeapInsertStudio } from "./HeapInsertStudio";
 export { ExtractMaxStudio } from "./ExtractMaxStudio";
 export { HeapCanvas, type HeapCanvasProps } from "./HeapCanvas";
+export { ListCanvas, type ListCanvasProps } from "./ListCanvas";
 export { GraphCanvas, type GraphCanvasProps } from "./GraphCanvas";
 export { TableCanvas, type TableCanvasProps } from "./TableCanvas";
+export { ReverseListStudio } from "./ReverseListStudio";

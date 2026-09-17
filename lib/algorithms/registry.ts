@@ -21,6 +21,7 @@ import { coinChangeMeta } from "@/lib/algorithms/coin-change/meta";
 import { heapifyMeta } from "@/lib/algorithms/heapify/meta";
 import { heapInsertMeta } from "@/lib/algorithms/heap-insert/meta";
 import { extractMaxMeta } from "@/lib/algorithms/extract-max/meta";
+import { reverseListMeta } from "@/lib/algorithms/reverse-list/meta";
 
 export const algorithms: AlgorithmMeta[] = [
   mergeSortMeta,
@@ -45,9 +46,17 @@ export const algorithms: AlgorithmMeta[] = [
   heapifyMeta,
   heapInsertMeta,
   extractMaxMeta,
+  reverseListMeta,
 ];
 
-export const FAMILY_ORDER = ["sorting", "searching", "graphs", "dp", "heaps"] as const;
+export const FAMILY_ORDER = [
+  "sorting",
+  "searching",
+  "graphs",
+  "dp",
+  "heaps",
+  "linked-lists",
+] as const;
 
 export const FAMILY_TITLES: Record<(typeof FAMILY_ORDER)[number], string> = {
   sorting: "Sorting",
@@ -55,6 +64,7 @@ export const FAMILY_TITLES: Record<(typeof FAMILY_ORDER)[number], string> = {
   graphs: "Graphs",
   dp: "Dynamic Programming",
   heaps: "Heaps",
+  "linked-lists": "Linked Lists",
 };
 
 export function getAlgorithm(slug: string): AlgorithmMeta | undefined {

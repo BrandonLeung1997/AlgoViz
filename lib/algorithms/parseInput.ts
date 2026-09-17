@@ -2,6 +2,7 @@ import {
   MAX_ARRAY_LENGTH,
   MAX_GRAPH_NODES,
   MAX_HEAP_SIZE,
+  MAX_LIST_LENGTH,
   MAX_STRING_LENGTH,
   directedEdgeKey,
   getDirectedEdgeWeight,
@@ -13,7 +14,13 @@ import {
 const NEGATIVE_WEIGHT_ERROR =
   "Negative edge weights are not allowed (Dijkstra needs non-negative weights).";
 
-export { MAX_ARRAY_LENGTH, MAX_GRAPH_NODES, MAX_HEAP_SIZE, MAX_STRING_LENGTH };
+export {
+  MAX_ARRAY_LENGTH,
+  MAX_GRAPH_NODES,
+  MAX_HEAP_SIZE,
+  MAX_LIST_LENGTH,
+  MAX_STRING_LENGTH,
+};
 
 export function parseStringInput(
   raw: string,
@@ -70,6 +77,20 @@ export function parseHeapInput(
     return {
       ok: false,
       error: `Use at most ${MAX_HEAP_SIZE} numbers.`,
+    };
+  }
+  return parsed;
+}
+
+export function parseListInput(
+  raw: string,
+): { ok: true; values: number[] } | { ok: false; error: string } {
+  const parsed = parseArrayInput(raw);
+  if (!parsed.ok) return parsed;
+  if (parsed.values.length > MAX_LIST_LENGTH) {
+    return {
+      ok: false,
+      error: `Use at most ${MAX_LIST_LENGTH} numbers.`,
     };
   }
   return parsed;

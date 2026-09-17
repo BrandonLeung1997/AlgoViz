@@ -80,6 +80,20 @@ export type HeapFrame = {
   highlights: Highlight[];
 };
 
+export type ListNodeFrame = {
+  id: number;
+  value: number;
+  next: number | null;
+};
+
+export type ListFrame = {
+  nodes: ListNodeFrame[];
+  head: number | null;
+  head2?: number | null;
+  pointers?: Record<string, number | null>;
+  highlightIds?: number[];
+};
+
 export type Step = {
   array: number[];
   highlights: Highlight[];
@@ -87,6 +101,7 @@ export type Step = {
   graph?: GraphFrame;
   dpTable?: DpTableFrame;
   heap?: HeapFrame;
+  list?: ListFrame;
   codeLineId: string;
   explanation: string;
 };
@@ -99,7 +114,13 @@ export type ComplexityCase = {
   space: string;
 };
 
-export type AlgorithmFamily = "sorting" | "searching" | "graphs" | "dp" | "heaps";
+export type AlgorithmFamily =
+  | "sorting"
+  | "searching"
+  | "graphs"
+  | "dp"
+  | "heaps"
+  | "linked-lists";
 
 export type AlgorithmMeta = {
   slug: string;
@@ -116,6 +137,7 @@ export type PlaybackSpeed = 0.5 | 1 | 1.5 | 2 | 3 | 4;
 export const BASE_STEP_MS = 700;
 export const MAX_ARRAY_LENGTH = 16;
 export const MAX_HEAP_SIZE = 8;
+export const MAX_LIST_LENGTH = 8;
 export const MAX_GRAPH_NODES = 12;
 export const MAX_STRING_LENGTH = 10;
 export const MAX_KNAPSACK_ITEMS = 6;
