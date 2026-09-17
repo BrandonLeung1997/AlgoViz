@@ -2,6 +2,7 @@ import type { AlgorithmMeta } from "@/lib/algorithms/types";
 import { binarySearchMeta } from "@/lib/algorithms/binary-search/meta";
 import { mergeSortMeta } from "@/lib/algorithms/merge-sort/meta";
 import { quickSortMeta } from "@/lib/algorithms/quick-sort/meta";
+import { bubbleSortMeta } from "@/lib/algorithms/bubble-sort/meta";
 import { bfsMeta } from "@/lib/algorithms/bfs/meta";
 import { dfsMeta } from "@/lib/algorithms/dfs/meta";
 import { dijkstraMeta } from "@/lib/algorithms/dijkstra/meta";
@@ -11,6 +12,7 @@ import { lcsMeta } from "@/lib/algorithms/lcs/meta";
 export const algorithms: AlgorithmMeta[] = [
   mergeSortMeta,
   quickSortMeta,
+  bubbleSortMeta,
   binarySearchMeta,
   bfsMeta,
   dfsMeta,
