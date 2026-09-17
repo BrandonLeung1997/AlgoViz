@@ -15,6 +15,7 @@ import { kruskalMeta } from "@/lib/algorithms/kruskal/meta";
 import { primMeta } from "@/lib/algorithms/prim/meta";
 import { topologicalSortMeta } from "@/lib/algorithms/topological-sort/meta";
 import { lcsMeta } from "@/lib/algorithms/lcs/meta";
+import { editDistanceMeta } from "@/lib/algorithms/edit-distance/meta";
 
 export const algorithms: AlgorithmMeta[] = [
   mergeSortMeta,
@@ -33,6 +34,7 @@ export const algorithms: AlgorithmMeta[] = [
   primMeta,
   topologicalSortMeta,
   lcsMeta,
+  editDistanceMeta,
 ];
 
 export const FAMILY_ORDER = ["sorting", "searching", "graphs", "dp"] as const;

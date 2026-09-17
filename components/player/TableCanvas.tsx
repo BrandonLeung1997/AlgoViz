@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 
 export type TableCanvasProps = {
   step: Step | undefined;
+  resultLabel?: string;
+  hint?: string;
 };
 
 function isCell(cell: DpCell | undefined, i: number, j: number): boolean {
@@ -24,7 +26,7 @@ function cellClass(
   return "bg-white text-slate-800";
 }
 
-export function TableCanvas({ step }: TableCanvasProps) {
+export function TableCanvas({ step, resultLabel, hint }: TableCanvasProps) {
   const table = step?.dpTable;
   const cells = table?.cells ?? [];
   const x = table?.x ?? "";
@@ -32,12 +34,16 @@ export function TableCanvas({ step }: TableCanvasProps) {
   const write = table?.write;
   const reads = table?.reads;
   const reconstructed = table?.reconstructed;
-  const lcsLabel =
+  const footerLabel = resultLabel ?? table?.resultLabel ?? "LCS";
+  const resultValue =
     reconstructed === undefined
       ? "—"
       : reconstructed.length === 0
         ? "(empty)"
         : reconstructed;
+  const caption =
+    hint ??
+    "dp[i][j] = LCS length of X[:i] and Y[:j] (row-major fill)";
   const colCount = (cells[0]?.length ?? 0) + 1;
 
   return (
@@ -96,15 +102,15 @@ export function TableCanvas({ step }: TableCanvasProps) {
         )}
       </div>
       <div className="mt-3 text-center text-xs text-slate-600">
-        LCS:{" "}
-        <span className="font-mono font-medium text-slate-800">{lcsLabel}</span>
+        {footerLabel}:{" "}
+        <span className="font-mono font-medium text-slate-800">{resultValue}</span>
       </div>
       <p className="mt-2 text-center text-xs text-slate-500">
         <span className="font-semibold text-sky-600">write</span>
         {" · "}
         <span className="font-semibold text-amber-600">read</span>
         {" · "}
-        dp[i][j] = LCS length of X[:i] and Y[:j] (row-major fill)
+        {caption}
       </p>
     </div>
   );

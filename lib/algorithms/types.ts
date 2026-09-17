@@ -67,6 +67,7 @@ export type DpTableFrame = {
   write?: DpCell;
   reads?: DpCell[];
   reconstructed?: string;
+  resultLabel?: string;
 };
 
 export type Step = {

@@ -23,5 +23,6 @@ export { KruskalStudio } from "./KruskalStudio";
 export { PrimStudio } from "./PrimStudio";
 export { TopoSortStudio } from "./TopoSortStudio";
 export { LcsStudio } from "./LcsStudio";
+export { EditDistanceStudio } from "./EditDistanceStudio";
 export { GraphCanvas, type GraphCanvasProps } from "./GraphCanvas";
 export { TableCanvas, type TableCanvasProps } from "./TableCanvas";
