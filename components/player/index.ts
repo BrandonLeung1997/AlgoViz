@@ -13,6 +13,7 @@ export { QuickSortStudio } from "./QuickSortStudio";
 export { BubbleSortStudio } from "./BubbleSortStudio";
 export { InsertionSortStudio } from "./InsertionSortStudio";
 export { SelectionSortStudio } from "./SelectionSortStudio";
+export { HeapSortStudio } from "./HeapSortStudio";
 export { BfsStudio } from "./BfsStudio";
 export { DfsStudio } from "./DfsStudio";
 export { DijkstraStudio } from "./DijkstraStudio";

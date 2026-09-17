@@ -11,6 +11,8 @@ import { INSERTION_SORT_CODE } from "@/lib/algorithms/insertion-sort/code";
 import { generateInsertionSortSteps } from "@/lib/algorithms/insertion-sort/generateSteps";
 import { SELECTION_SORT_CODE } from "@/lib/algorithms/selection-sort/code";
 import { generateSelectionSortSteps } from "@/lib/algorithms/selection-sort/generateSteps";
+import { HEAP_SORT_CODE } from "@/lib/algorithms/heap-sort/code";
+import { generateHeapSortSteps } from "@/lib/algorithms/heap-sort/generateSteps";
 import { BFS_CODE } from "@/lib/algorithms/bfs/code";
 import { generateBfsSteps } from "@/lib/algorithms/bfs/generateSteps";
 import { DFS_CODE } from "@/lib/algorithms/dfs/code";
@@ -154,6 +156,32 @@ describe("selection sort code line ids", () => {
       generateSelectionSortSteps([3, 1, 1, 2]),
       generateSelectionSortSteps([7]),
       generateSelectionSortSteps([]),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+});
+
+describe("heap sort code line ids", () => {
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof HEAP_SORT_CODE) =>
+      new Set(HEAP_SORT_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(HEAP_SORT_CODE.python.map((l) => l.id));
+    const runs = [
+      generateHeapSortSteps([9, 4, 1, 7, 3]),
+      generateHeapSortSteps([1, 2, 3, 4]),
+      generateHeapSortSteps([4, 3, 2, 1]),
+      generateHeapSortSteps([3, 1, 1, 2]),
+      generateHeapSortSteps([7]),
+      generateHeapSortSteps([]),
     ];
     for (const steps of runs) {
       for (const step of steps) {
