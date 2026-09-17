@@ -25,8 +25,11 @@ import { BELLMAN_FORD_CODE } from "@/lib/algorithms/bellman-ford/code";
 import { generateBellmanFordSteps } from "@/lib/algorithms/bellman-ford/generateSteps";
 import { KRUSKAL_CODE } from "@/lib/algorithms/kruskal/code";
 import { generateKruskalSteps } from "@/lib/algorithms/kruskal/generateSteps";
+import { PRIM_CODE } from "@/lib/algorithms/prim/code";
+import { generatePrimSteps } from "@/lib/algorithms/prim/generateSteps";
 import {
   DEFAULT_BELLMAN_FORD_GRAPH,
+  DEFAULT_DIJKSTRA_GRAPH,
   DEFAULT_MST_GRAPH,
 } from "@/lib/algorithms/randomGraph";
 import { TOPO_SORT_CODE } from "@/lib/algorithms/topological-sort/code";
@@ -387,6 +390,35 @@ describe("kruskal code line ids", () => {
       generateKruskalSteps(triangle),
       generateKruskalSteps({ nodes: [0], adj: { 0: [] } }),
       generateKruskalSteps(disconnected),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+});
+
+describe("prim code line ids", () => {
+  const disconnected: Graph = {
+    nodes: [0, 1, 2, 3],
+    adj: { 0: [1], 1: [0], 2: [3], 3: [2] },
+    weights: { "0-1": 1, "2-3": 2 },
+  };
+
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof PRIM_CODE) =>
+      new Set(PRIM_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(PRIM_CODE.python.map((l) => l.id));
+    const runs = [
+      generatePrimSteps(DEFAULT_DIJKSTRA_GRAPH, 0),
+      generatePrimSteps({ nodes: [0], adj: { 0: [] } }, 0),
+      generatePrimSteps(disconnected, 0),
     ];
     for (const steps of runs) {
       for (const step of steps) {

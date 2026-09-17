@@ -12,6 +12,7 @@ import { dfsMeta } from "@/lib/algorithms/dfs/meta";
 import { dijkstraMeta } from "@/lib/algorithms/dijkstra/meta";
 import { bellmanFordMeta } from "@/lib/algorithms/bellman-ford/meta";
 import { kruskalMeta } from "@/lib/algorithms/kruskal/meta";
+import { primMeta } from "@/lib/algorithms/prim/meta";
 import { topologicalSortMeta } from "@/lib/algorithms/topological-sort/meta";
 import { lcsMeta } from "@/lib/algorithms/lcs/meta";
 
@@ -29,6 +30,7 @@ export const algorithms: AlgorithmMeta[] = [
   dijkstraMeta,
   bellmanFordMeta,
   kruskalMeta,
+  primMeta,
   topologicalSortMeta,
   lcsMeta,
 ];
