@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   parseArrayInput,
+  parseHeapInput,
   parseTargetInput,
   parseGraphInput,
   parseStringInput,
   formatGraphInput,
   MAX_ARRAY_LENGTH,
   MAX_GRAPH_NODES,
+  MAX_HEAP_SIZE,
   MAX_STRING_LENGTH,
 } from "@/lib/algorithms/parseInput";
 
@@ -32,6 +34,24 @@ describe("parseArrayInput", () => {
     const raw = Array.from({ length: MAX_ARRAY_LENGTH + 1 }, (_, i) => i + 1).join(",");
     const result = parseArrayInput(raw);
     expect(result.ok).toBe(false);
+  });
+});
+
+describe("parseHeapInput", () => {
+  it("parses a heap-sized array", () => {
+    expect(parseHeapInput("8, 3, 5, 1")).toEqual({
+      ok: true,
+      values: [8, 3, 5, 1],
+    });
+  });
+
+  it("rejects arrays longer than MAX_HEAP_SIZE", () => {
+    const raw = Array.from({ length: MAX_HEAP_SIZE + 1 }, (_, i) => i + 1).join(",");
+    const result = parseHeapInput(raw);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toContain(String(MAX_HEAP_SIZE));
+    }
   });
 });
 

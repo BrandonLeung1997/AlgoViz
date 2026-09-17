@@ -26,5 +26,7 @@ export { LcsStudio } from "./LcsStudio";
 export { EditDistanceStudio } from "./EditDistanceStudio";
 export { KnapsackStudio } from "./KnapsackStudio";
 export { CoinChangeStudio } from "./CoinChangeStudio";
+export { HeapifyStudio } from "./HeapifyStudio";
+export { HeapCanvas, type HeapCanvasProps } from "./HeapCanvas";
 export { GraphCanvas, type GraphCanvasProps } from "./GraphCanvas";
 export { TableCanvas, type TableCanvasProps } from "./TableCanvas";

@@ -1,6 +1,18 @@
-import { MAX_ARRAY_LENGTH } from "@/lib/algorithms/types";
+import { MAX_ARRAY_LENGTH, MAX_HEAP_SIZE } from "@/lib/algorithms/types";
 
 export function randomArray(length = 10): number[] {
   const n = Math.min(Math.max(length, 1), MAX_ARRAY_LENGTH);
   return Array.from({ length: n }, () => Math.floor(Math.random() * 50) + 1);
+}
+
+export function randomHeapArray(): number[] {
+  const n = Math.min(6 + Math.floor(Math.random() * 3), MAX_HEAP_SIZE);
+  const pool = Array.from({ length: 50 }, (_, i) => i + 1);
+  for (let i = pool.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = pool[i]!;
+    pool[i] = pool[j]!;
+    pool[j] = tmp;
+  }
+  return pool.slice(0, n);
 }

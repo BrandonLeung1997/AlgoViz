@@ -74,12 +74,19 @@ export type DpTableFrame = {
   colLabels?: string[];
 };
 
+export type HeapFrame = {
+  values: number[];
+  heapSize: number;
+  highlights: Highlight[];
+};
+
 export type Step = {
   array: number[];
   highlights: Highlight[];
   range?: { low: number; mid?: number; high: number };
   graph?: GraphFrame;
   dpTable?: DpTableFrame;
+  heap?: HeapFrame;
   codeLineId: string;
   explanation: string;
 };
@@ -92,7 +99,7 @@ export type ComplexityCase = {
   space: string;
 };
 
-export type AlgorithmFamily = "sorting" | "searching" | "graphs" | "dp";
+export type AlgorithmFamily = "sorting" | "searching" | "graphs" | "dp" | "heaps";
 
 export type AlgorithmMeta = {
   slug: string;
@@ -108,6 +115,7 @@ export type PlaybackSpeed = 0.5 | 1 | 1.5 | 2 | 3 | 4;
 
 export const BASE_STEP_MS = 700;
 export const MAX_ARRAY_LENGTH = 16;
+export const MAX_HEAP_SIZE = 8;
 export const MAX_GRAPH_NODES = 12;
 export const MAX_STRING_LENGTH = 10;
 export const MAX_KNAPSACK_ITEMS = 6;

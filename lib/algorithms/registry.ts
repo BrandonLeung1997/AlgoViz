@@ -18,6 +18,7 @@ import { lcsMeta } from "@/lib/algorithms/lcs/meta";
 import { editDistanceMeta } from "@/lib/algorithms/edit-distance/meta";
 import { knapsackMeta } from "@/lib/algorithms/knapsack/meta";
 import { coinChangeMeta } from "@/lib/algorithms/coin-change/meta";
+import { heapifyMeta } from "@/lib/algorithms/heapify/meta";
 
 export const algorithms: AlgorithmMeta[] = [
   mergeSortMeta,
@@ -39,15 +40,17 @@ export const algorithms: AlgorithmMeta[] = [
   editDistanceMeta,
   knapsackMeta,
   coinChangeMeta,
+  heapifyMeta,
 ];
 
-export const FAMILY_ORDER = ["sorting", "searching", "graphs", "dp"] as const;
+export const FAMILY_ORDER = ["sorting", "searching", "graphs", "dp", "heaps"] as const;
 
 export const FAMILY_TITLES: Record<(typeof FAMILY_ORDER)[number], string> = {
   sorting: "Sorting",
   searching: "Searching",
   graphs: "Graphs",
   dp: "Dynamic Programming",
+  heaps: "Heaps",
 };
 
 export function getAlgorithm(slug: string): AlgorithmMeta | undefined {
