@@ -3,6 +3,7 @@ import {
   parseArrayInput,
   parseHeapInput,
   parseListInput,
+  parseCycleIndex,
   parseTargetInput,
   parseGraphInput,
   parseStringInput,
@@ -74,6 +75,31 @@ describe("parseListInput", () => {
     if (!result.ok) {
       expect(result.error).toContain(String(MAX_LIST_LENGTH));
     }
+  });
+});
+
+describe("parseCycleIndex", () => {
+  it("treats empty, none, and null as acyclic", () => {
+    expect(parseCycleIndex("", 4)).toEqual({ ok: true, value: null });
+    expect(parseCycleIndex("  ", 4)).toEqual({ ok: true, value: null });
+    expect(parseCycleIndex("none", 4)).toEqual({ ok: true, value: null });
+    expect(parseCycleIndex("None", 4)).toEqual({ ok: true, value: null });
+  });
+
+  it("parses an in-range index", () => {
+    expect(parseCycleIndex("1", 4)).toEqual({ ok: true, value: 1 });
+    expect(parseCycleIndex("0", 1)).toEqual({ ok: true, value: 0 });
+  });
+
+  it("rejects an out-of-range index", () => {
+    const result = parseCycleIndex("4", 4);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain("0");
+  });
+
+  it("rejects a non-integer", () => {
+    const result = parseCycleIndex("middle", 4);
+    expect(result.ok).toBe(false);
   });
 });
 

@@ -22,6 +22,7 @@ import { heapifyMeta } from "@/lib/algorithms/heapify/meta";
 import { heapInsertMeta } from "@/lib/algorithms/heap-insert/meta";
 import { extractMaxMeta } from "@/lib/algorithms/extract-max/meta";
 import { reverseListMeta } from "@/lib/algorithms/reverse-list/meta";
+import { cycleDetectionMeta } from "@/lib/algorithms/cycle-detection/meta";
 
 export const algorithms: AlgorithmMeta[] = [
   mergeSortMeta,
@@ -47,6 +48,7 @@ export const algorithms: AlgorithmMeta[] = [
   heapInsertMeta,
   extractMaxMeta,
   reverseListMeta,
+  cycleDetectionMeta,
 ];
 
 export const FAMILY_ORDER = [

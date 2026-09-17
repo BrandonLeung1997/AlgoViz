@@ -96,6 +96,30 @@ export function parseListInput(
   return parsed;
 }
 
+export function parseCycleIndex(
+  raw: string,
+  length: number,
+): { ok: true; value: number | null } | { ok: false; error: string } {
+  const trimmed = raw.trim();
+  if (!trimmed || /^(none|null|-)$/i.test(trimmed)) {
+    return { ok: true, value: null };
+  }
+  if (!/^-?\d+$/.test(trimmed)) {
+    return { ok: false, error: `“${trimmed}” is not an index.` };
+  }
+  const value = Number(trimmed);
+  if (length <= 0) {
+    return { ok: false, error: "Empty list has no cycle index." };
+  }
+  if (value < 0 || value >= length) {
+    return {
+      ok: false,
+      error: `Index must be between 0 and ${length - 1}.`,
+    };
+  }
+  return { ok: true, value };
+}
+
 export function parseTargetInput(
   raw: string,
 ): { ok: true; value: number } | { ok: false; error: string } {

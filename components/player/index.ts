@@ -34,3 +34,4 @@ export { ListCanvas, type ListCanvasProps } from "./ListCanvas";
 export { GraphCanvas, type GraphCanvasProps } from "./GraphCanvas";
 export { TableCanvas, type TableCanvasProps } from "./TableCanvas";
 export { ReverseListStudio } from "./ReverseListStudio";
+export { CycleDetectionStudio } from "./CycleDetectionStudio";

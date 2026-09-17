@@ -50,6 +50,8 @@ import { EXTRACT_MAX_CODE } from "@/lib/algorithms/extract-max/code";
 import { generateExtractMaxSteps } from "@/lib/algorithms/extract-max/generateSteps";
 import { REVERSE_LIST_CODE } from "@/lib/algorithms/reverse-list/code";
 import { generateReverseListSteps } from "@/lib/algorithms/reverse-list/generateSteps";
+import { CYCLE_DETECTION_CODE } from "@/lib/algorithms/cycle-detection/code";
+import { generateCycleDetectionSteps } from "@/lib/algorithms/cycle-detection/generateSteps";
 import type { Graph } from "@/lib/algorithms/types";
 
 describe("merge sort code line ids", () => {
@@ -717,6 +719,31 @@ describe("reverse list code line ids", () => {
       generateReverseListSteps([1, 2, 3, 4]),
       generateReverseListSteps([7]),
       generateReverseListSteps([]),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+});
+
+describe("cycle detection code line ids", () => {
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof CYCLE_DETECTION_CODE) =>
+      new Set(CYCLE_DETECTION_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(CYCLE_DETECTION_CODE.python.map((l) => l.id));
+    const runs = [
+      generateCycleDetectionSteps([1, 2, 3], null),
+      generateCycleDetectionSteps([1, 2, 3, 4], 1),
+      generateCycleDetectionSteps([7], 0),
+      generateCycleDetectionSteps([7], null),
+      generateCycleDetectionSteps([], null),
     ];
     for (const steps of runs) {
       for (const step of steps) {
