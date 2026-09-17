@@ -85,6 +85,27 @@ export function randomWeightedGraph(nodeCount = 7): Graph {
   return randomGraph(nodeCount, { weights: true });
 }
 
+/** Unique MST teaching graph: cheapest edges 0-1, 1-2, 3-4, 0-4; skip the rest. */
+export const DEFAULT_MST_GRAPH: Graph = {
+  nodes: [0, 1, 2, 3, 4],
+  adj: {
+    0: [1, 2, 4],
+    1: [0, 2, 3],
+    2: [0, 1, 3],
+    3: [1, 2, 4],
+    4: [0, 3],
+  },
+  weights: {
+    "0-1": 1,
+    "0-2": 10,
+    "0-4": 3,
+    "1-2": 1,
+    "1-3": 8,
+    "2-3": 4,
+    "3-4": 1,
+  },
+};
+
 /** Classic teaching DAG: 0→1, 0→2, 1→3, 2→3. */
 export const DEFAULT_TOPO_GRAPH: Graph = {
   nodes: [0, 1, 2, 3],

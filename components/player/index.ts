@@ -19,6 +19,7 @@ export { BfsStudio } from "./BfsStudio";
 export { DfsStudio } from "./DfsStudio";
 export { DijkstraStudio } from "./DijkstraStudio";
 export { BellmanFordStudio } from "./BellmanFordStudio";
+export { KruskalStudio } from "./KruskalStudio";
 export { TopoSortStudio } from "./TopoSortStudio";
 export { LcsStudio } from "./LcsStudio";
 export { GraphCanvas, type GraphCanvasProps } from "./GraphCanvas";

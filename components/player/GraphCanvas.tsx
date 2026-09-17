@@ -60,6 +60,9 @@ export type GraphCanvasProps = {
   showWeights?: boolean;
   directed?: boolean;
   pathLabel?: string;
+  treeLegend?: string;
+  relaxedLegend?: string;
+  showSourceLegend?: boolean;
 };
 
 function shouldShowWeight(edge: GraphEdge, showWeights: boolean) {
@@ -83,6 +86,9 @@ export function GraphCanvas({
   showWeights = false,
   directed = false,
   pathLabel = "Path",
+  treeLegend = "tree edge",
+  relaxedLegend = "relaxed",
+  showSourceLegend = true,
 }: GraphCanvasProps) {
   const graph = step?.graph;
   const nodes = graph?.nodes ?? [];
@@ -242,17 +248,21 @@ export function GraphCanvas({
         </span>
       </div>
       <p className="mt-2 text-center text-xs text-slate-500">
-        <span className="font-semibold text-sky-700">source</span>
-        {" · "}
+        {showSourceLegend ? (
+          <>
+            <span className="font-semibold text-sky-700">source</span>
+            {" · "}
+          </>
+        ) : null}
         <span className="font-semibold text-amber-600">current</span>
         {" · "}
         <span className="font-semibold text-sky-400">frontier</span>
         {" · "}
         <span className="font-semibold text-green-600">visited</span>
         {" · "}
-        <span className="font-semibold text-green-700">tree edge</span>
+        <span className="font-semibold text-green-700">{treeLegend}</span>
         {" · "}
-        <span className="font-semibold text-amber-500">relaxed</span>
+        <span className="font-semibold text-amber-500">{relaxedLegend}</span>
       </p>
     </div>
   );
