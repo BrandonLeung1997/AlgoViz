@@ -40,6 +40,8 @@ import { EDIT_DISTANCE_CODE } from "@/lib/algorithms/edit-distance/code";
 import { generateEditDistanceSteps } from "@/lib/algorithms/edit-distance/generateSteps";
 import { KNAPSACK_CODE } from "@/lib/algorithms/knapsack/code";
 import { generateKnapsackSteps } from "@/lib/algorithms/knapsack/generateSteps";
+import { COIN_CHANGE_CODE } from "@/lib/algorithms/coin-change/code";
+import { generateCoinChangeSteps } from "@/lib/algorithms/coin-change/generateSteps";
 import type { Graph } from "@/lib/algorithms/types";
 
 describe("merge sort code line ids", () => {
@@ -566,6 +568,47 @@ describe("knapsack code line ids", () => {
   it("every write step codeLineId is in the listings", () => {
     const valid = new Set(KNAPSACK_CODE.python.map((l) => l.id));
     for (const step of generateKnapsackSteps(classic, 5)) {
+      if (
+        step.codeLineId === "skip" ||
+        step.codeLineId === "take" ||
+        step.codeLineId === "choose"
+      ) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+        expect(step.dpTable?.write).toBeDefined();
+      }
+    }
+  });
+});
+
+describe("coin change code line ids", () => {
+  const classic = [1, 3, 4];
+
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof COIN_CHANGE_CODE) =>
+      new Set(COIN_CHANGE_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(COIN_CHANGE_CODE.python.map((l) => l.id));
+    const runs = [
+      generateCoinChangeSteps(classic, 6),
+      generateCoinChangeSteps([2, 4], 3),
+      generateCoinChangeSteps(classic, 0),
+      generateCoinChangeSteps([], 0),
+      generateCoinChangeSteps([], 5),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+
+  it("every write step codeLineId is in the listings", () => {
+    const valid = new Set(COIN_CHANGE_CODE.python.map((l) => l.id));
+    for (const step of generateCoinChangeSteps(classic, 6)) {
       if (
         step.codeLineId === "skip" ||
         step.codeLineId === "take" ||

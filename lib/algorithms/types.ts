@@ -112,3 +112,5 @@ export const MAX_GRAPH_NODES = 12;
 export const MAX_STRING_LENGTH = 10;
 export const MAX_KNAPSACK_ITEMS = 6;
 export const MAX_KNAPSACK_CAPACITY = 12;
+export const MAX_COIN_TYPES = 6;
+export const MAX_COIN_AMOUNT = 15;

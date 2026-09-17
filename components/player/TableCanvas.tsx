@@ -38,6 +38,10 @@ function rowHeader(table: DpTableFrame, i: number): string {
   return i === 0 ? "ε" : (table.x[i - 1] ?? "");
 }
 
+function formatCellValue(value: number): string {
+  return Number.isFinite(value) ? String(value) : "∞";
+}
+
 export function TableCanvas({ step, resultLabel, hint }: TableCanvasProps) {
   const table = step?.dpTable;
   const cells = table?.cells ?? [];
@@ -118,9 +122,9 @@ export function TableCanvas({ step, resultLabel, hint }: TableCanvasProps) {
                         "flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium tabular-nums transition-colors duration-150",
                         cellClass(i, j, write, reads),
                       )}
-                      title={`dp[${i}][${j}] = ${value}`}
+                      title={`dp[${i}][${j}] = ${formatCellValue(value)}`}
                     >
-                      {value}
+                      {formatCellValue(value)}
                     </div>
                   ))}
                 </Fragment>

@@ -71,4 +71,35 @@ describe("TableCanvas axis labels", () => {
     expect(screen.getByText(/Value:/)).toBeInTheDocument();
     expect(screen.getByText(/items 1 value=3/)).toBeInTheDocument();
   });
+
+  it("renders ∞ for unreachable Infinity cells without changing LCS integers", () => {
+    const step: Step = {
+      array: [],
+      highlights: [],
+      codeLineId: "done",
+      explanation: "done",
+      dpTable: {
+        x: "",
+        y: "",
+        cells: [
+          [0, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY],
+          [0, Number.POSITIVE_INFINITY, 1],
+        ],
+        rowLabels: ["ε", "c=2"],
+        colLabels: ["0", "1", "2"],
+        resultLabel: "Coins",
+        reconstructed: "impossible",
+      },
+    };
+    render(<TableCanvas step={step} />);
+    expect(screen.getAllByText("∞").length).toBe(3);
+    expect(screen.queryByText("Infinity")).not.toBeInTheDocument();
+    expect(screen.getByText(/impossible/)).toBeInTheDocument();
+
+    cleanup();
+    const lcs = generateLcsSteps("AB", "CD").at(-1)!;
+    render(<TableCanvas step={lcs} />);
+    expect(screen.queryByText("∞")).not.toBeInTheDocument();
+    expect(screen.getAllByText("0").length).toBeGreaterThan(0);
+  });
 });

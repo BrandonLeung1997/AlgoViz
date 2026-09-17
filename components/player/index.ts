@@ -25,5 +25,6 @@ export { TopoSortStudio } from "./TopoSortStudio";
 export { LcsStudio } from "./LcsStudio";
 export { EditDistanceStudio } from "./EditDistanceStudio";
 export { KnapsackStudio } from "./KnapsackStudio";
+export { CoinChangeStudio } from "./CoinChangeStudio";
 export { GraphCanvas, type GraphCanvasProps } from "./GraphCanvas";
 export { TableCanvas, type TableCanvasProps } from "./TableCanvas";

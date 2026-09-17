@@ -17,6 +17,7 @@ import { topologicalSortMeta } from "@/lib/algorithms/topological-sort/meta";
 import { lcsMeta } from "@/lib/algorithms/lcs/meta";
 import { editDistanceMeta } from "@/lib/algorithms/edit-distance/meta";
 import { knapsackMeta } from "@/lib/algorithms/knapsack/meta";
+import { coinChangeMeta } from "@/lib/algorithms/coin-change/meta";
 
 export const algorithms: AlgorithmMeta[] = [
   mergeSortMeta,
@@ -37,6 +38,7 @@ export const algorithms: AlgorithmMeta[] = [
   lcsMeta,
   editDistanceMeta,
   knapsackMeta,
+  coinChangeMeta,
 ];
 
 export const FAMILY_ORDER = ["sorting", "searching", "graphs", "dp"] as const;
