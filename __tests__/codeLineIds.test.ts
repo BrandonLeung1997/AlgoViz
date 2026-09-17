@@ -46,6 +46,8 @@ import { HEAPIFY_CODE } from "@/lib/algorithms/heapify/code";
 import { generateHeapifySteps } from "@/lib/algorithms/heapify/generateSteps";
 import { HEAP_INSERT_CODE } from "@/lib/algorithms/heap-insert/code";
 import { generateHeapInsertSteps } from "@/lib/algorithms/heap-insert/generateSteps";
+import { EXTRACT_MAX_CODE } from "@/lib/algorithms/extract-max/code";
+import { generateExtractMaxSteps } from "@/lib/algorithms/extract-max/generateSteps";
 import type { Graph } from "@/lib/algorithms/types";
 
 describe("merge sort code line ids", () => {
@@ -666,6 +668,30 @@ describe("heap insert code line ids", () => {
       generateHeapInsertSteps([], 7),
       generateHeapInsertSteps([4], 9),
       generateHeapInsertSteps([4], 2),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+});
+
+describe("extract max code line ids", () => {
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof EXTRACT_MAX_CODE) =>
+      new Set(EXTRACT_MAX_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(EXTRACT_MAX_CODE.python.map((l) => l.id));
+    const runs = [
+      generateExtractMaxSteps([9, 5, 6, 1]),
+      generateExtractMaxSteps([]),
+      generateExtractMaxSteps([4]),
+      generateExtractMaxSteps([9, 5, 6]),
     ];
     for (const steps of runs) {
       for (const step of steps) {

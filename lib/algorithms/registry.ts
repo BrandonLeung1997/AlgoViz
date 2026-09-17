@@ -20,6 +20,7 @@ import { knapsackMeta } from "@/lib/algorithms/knapsack/meta";
 import { coinChangeMeta } from "@/lib/algorithms/coin-change/meta";
 import { heapifyMeta } from "@/lib/algorithms/heapify/meta";
 import { heapInsertMeta } from "@/lib/algorithms/heap-insert/meta";
+import { extractMaxMeta } from "@/lib/algorithms/extract-max/meta";
 
 export const algorithms: AlgorithmMeta[] = [
   mergeSortMeta,
@@ -43,6 +44,7 @@ export const algorithms: AlgorithmMeta[] = [
   coinChangeMeta,
   heapifyMeta,
   heapInsertMeta,
+  extractMaxMeta,
 ];
 
 export const FAMILY_ORDER = ["sorting", "searching", "graphs", "dp", "heaps"] as const;

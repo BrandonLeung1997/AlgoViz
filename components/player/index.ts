@@ -28,6 +28,7 @@ export { KnapsackStudio } from "./KnapsackStudio";
 export { CoinChangeStudio } from "./CoinChangeStudio";
 export { HeapifyStudio } from "./HeapifyStudio";
 export { HeapInsertStudio } from "./HeapInsertStudio";
+export { ExtractMaxStudio } from "./ExtractMaxStudio";
 export { HeapCanvas, type HeapCanvasProps } from "./HeapCanvas";
 export { GraphCanvas, type GraphCanvasProps } from "./GraphCanvas";
 export { TableCanvas, type TableCanvasProps } from "./TableCanvas";
