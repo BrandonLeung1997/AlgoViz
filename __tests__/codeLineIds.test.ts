@@ -11,6 +11,8 @@ import { DFS_CODE } from "@/lib/algorithms/dfs/code";
 import { generateDfsSteps } from "@/lib/algorithms/dfs/generateSteps";
 import { DIJKSTRA_CODE } from "@/lib/algorithms/dijkstra/code";
 import { generateDijkstraSteps } from "@/lib/algorithms/dijkstra/generateSteps";
+import { TOPO_SORT_CODE } from "@/lib/algorithms/topological-sort/code";
+import { generateTopoSortSteps } from "@/lib/algorithms/topological-sort/generateSteps";
 import type { Graph } from "@/lib/algorithms/types";
 
 describe("merge sort code line ids", () => {
@@ -172,6 +174,37 @@ describe("dijkstra code line ids", () => {
         },
         0,
       ),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+});
+
+describe("topological sort code line ids", () => {
+  const diamond: Graph = {
+    nodes: [0, 1, 2, 3],
+    adj: { 0: [1, 2], 1: [3], 2: [3], 3: [] },
+  };
+
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof TOPO_SORT_CODE) =>
+      new Set(TOPO_SORT_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(TOPO_SORT_CODE.python.map((l) => l.id));
+    const runs = [
+      generateTopoSortSteps(diamond),
+      generateTopoSortSteps({ nodes: [0], adj: { 0: [] } }),
+      generateTopoSortSteps({
+        nodes: [0, 1, 2],
+        adj: { 0: [1], 1: [2], 2: [0] },
+      }),
     ];
     for (const steps of runs) {
       for (const step of steps) {

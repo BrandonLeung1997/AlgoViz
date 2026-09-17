@@ -149,4 +149,62 @@ describe("parseGraphInput", () => {
     if (!weighted.ok) return;
     expect(formatGraphInput(weighted.graph)).toBe("0-1:4, 0-2:10, 1-2");
   });
+
+  it("keeps undirected 0-1 as both directions when directed mode is off", () => {
+    const result = parseGraphInput("0-1");
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.graph.adj[0]).toEqual([1]);
+    expect(result.graph.adj[1]).toEqual([0]);
+  });
+
+  it("parses directed 0>1 and 0->1 as one-way edges", () => {
+    const gt = parseGraphInput("0>1, 0>2, 1>3, 2>3", { directed: true });
+    expect(gt.ok).toBe(true);
+    if (!gt.ok) return;
+    expect(gt.graph.nodes).toEqual([0, 1, 2, 3]);
+    expect(gt.graph.adj[0]).toEqual(expect.arrayContaining([1, 2]));
+    expect(gt.graph.adj[1]).toEqual([3]);
+    expect(gt.graph.adj[2]).toEqual([3]);
+    expect(gt.graph.adj[3]).toEqual([]);
+    expect(gt.graph.adj[1]).not.toContain(0);
+
+    const arrow = parseGraphInput("0->1, 1->2", { directed: true });
+    expect(arrow.ok).toBe(true);
+    if (!arrow.ok) return;
+    expect(arrow.graph.adj[0]).toEqual([1]);
+    expect(arrow.graph.adj[1]).toEqual([2]);
+    expect(arrow.graph.adj[2]).toEqual([]);
+    expect(arrow.graph.adj[1]).not.toContain(0);
+  });
+
+  it("rejects undirected 0-1 in directed mode so Kahn is never fed a 2-cycle by accident", () => {
+    const result = parseGraphInput("0-1, 1-2", { directed: true });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.toLowerCase()).toMatch(/directed/);
+    expect(result.error).toMatch(/>|→|->/);
+  });
+
+  it("keeps adjacency lists one-way in directed mode", () => {
+    const result = parseGraphInput("0:1,2; 1:3; 2:3; 3:", { directed: true });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.graph.adj[0]).toEqual([1, 2]);
+    expect(result.graph.adj[3]).toEqual([]);
+    expect(result.graph.adj[1]).not.toContain(0);
+  });
+
+  it("formats directed graphs with > and round-trips", () => {
+    const parsed = parseGraphInput("0>1, 0>2, 1>3, 2>3", { directed: true });
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const formatted = formatGraphInput(parsed.graph, { directed: true });
+    expect(formatted).toMatch(/>/);
+    expect(formatted).not.toMatch(/\d-\d/);
+    const again = parseGraphInput(formatted, { directed: true });
+    expect(again.ok).toBe(true);
+    if (!again.ok) return;
+    expect(again.graph.adj).toEqual(parsed.graph.adj);
+  });
 });

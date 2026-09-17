@@ -58,6 +58,8 @@ export type GraphCanvasProps = {
   step: Step | undefined;
   frontierLabel?: string;
   showWeights?: boolean;
+  directed?: boolean;
+  pathLabel?: string;
 };
 
 function shouldShowWeight(edge: GraphEdge, showWeights: boolean) {
@@ -69,10 +71,18 @@ function formatDist(value: number): string {
   return Number.isFinite(value) ? String(value) : "∞";
 }
 
+const ARROW_COLORS = ["#f59e0b", "#16a34a", "#0284c7", "#cbd5e1"] as const;
+
+function markerId(stroke: string) {
+  return `graph-arrow-${stroke.replace("#", "")}`;
+}
+
 export function GraphCanvas({
   step,
   frontierLabel = "Queue",
   showWeights = false,
+  directed = false,
+  pathLabel = "Path",
 }: GraphCanvasProps) {
   const graph = step?.graph;
   const nodes = graph?.nodes ?? [];
@@ -95,28 +105,65 @@ export function GraphCanvas({
             className="mx-auto h-[280px] w-full max-w-[520px]"
             role="img"
           >
+            {directed ? (
+              <defs>
+                {ARROW_COLORS.map((color) => (
+                  <marker
+                    key={color}
+                    id={markerId(color)}
+                    markerWidth="8"
+                    markerHeight="8"
+                    refX="7"
+                    refY="4"
+                    orient="auto"
+                    markerUnits="userSpaceOnUse"
+                  >
+                    <path d="M0,0.5 L8,4 L0,7.5 z" fill={color} />
+                  </marker>
+                ))}
+              </defs>
+            ) : null}
             {(graph?.edges ?? []).map((edge) => {
               const a = pos.get(edge.from);
               const b = pos.get(edge.to);
               if (!a || !b) return null;
               const style = edgeStyle(edge.from, edge.to, graph!);
-              const mx = (a.x + b.x) / 2;
-              const my = (a.y + b.y) / 2;
               const dx = b.x - a.x;
               const dy = b.y - a.y;
               const len = Math.hypot(dx, dy) || 1;
-              const labelX = mx - (dy / len) * 10;
-              const labelY = my + (dx / len) * 10;
+              const ux = dx / len;
+              const uy = dy / len;
+              const reverse = directed
+                ? (graph?.edges ?? []).some(
+                    (e) => e.from === edge.to && e.to === edge.from,
+                  )
+                : false;
+              const ox = reverse ? -uy * 6 : 0;
+              const oy = reverse ? ux * 6 : 0;
+              const startInset = directed ? NODE_R : 0;
+              const endInset = directed ? NODE_R + 2 : 0;
+              const x1 = a.x + ux * startInset + ox;
+              const y1 = a.y + uy * startInset + oy;
+              const x2 = b.x - ux * endInset + ox;
+              const y2 = b.y - uy * endInset + oy;
+              const mx = (x1 + x2) / 2;
+              const my = (y1 + y2) / 2;
+              const labelX = mx - uy * 10;
+              const labelY = my + ux * 10;
+              const marker = directed
+                ? `url(#${markerId(style.stroke)})`
+                : undefined;
               return (
-                <g key={`${edge.from}-${edge.to}`}>
+                <g key={`${edge.from}-${edge.to}-${edge.from > edge.to ? "r" : "f"}`}>
                   <motion.line
-                    x1={a.x}
-                    y1={a.y}
-                    x2={b.x}
-                    y2={b.y}
+                    x1={x1}
+                    y1={y1}
+                    x2={x2}
+                    y2={y2}
                     stroke={style.stroke}
                     strokeWidth={style.width}
                     strokeLinecap="round"
+                    markerEnd={marker}
                     initial={false}
                     animate={{ stroke: style.stroke, strokeWidth: style.width }}
                     transition={{ duration: 0.2 }}
@@ -188,7 +235,7 @@ export function GraphCanvas({
         </span>
         <span className="text-slate-300">·</span>
         <span>
-          Path:{" "}
+          {pathLabel}:{" "}
           <span className="font-mono font-medium text-slate-800">
             {(graph?.path ?? []).join(" → ") || "—"}
           </span>

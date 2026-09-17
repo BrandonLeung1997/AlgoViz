@@ -8,6 +8,7 @@ import { generateQuickSortSteps } from "@/lib/algorithms/quick-sort/generateStep
 import { generateBfsSteps } from "@/lib/algorithms/bfs/generateSteps";
 import { generateDfsSteps } from "@/lib/algorithms/dfs/generateSteps";
 import { generateDijkstraSteps } from "@/lib/algorithms/dijkstra/generateSteps";
+import { generateTopoSortSteps } from "@/lib/algorithms/topological-sort/generateSteps";
 
 describe("usePlayback", () => {
   beforeEach(() => {
@@ -157,6 +158,21 @@ describe("usePlayback", () => {
     expect(result.current.steps.length).toBeGreaterThan(0);
     expect(result.current.steps.at(-1)?.codeLineId).toBe("done");
     expect(result.current.steps.at(-1)?.graph?.parent?.[2]).toBe(1);
+    act(() => result.current.stepForward());
+    expect(result.current.index).toBe(1);
+  });
+
+  it("plays a topological sort timeline", () => {
+    const graph = {
+      nodes: [0, 1, 2, 3],
+      adj: { 0: [1, 2], 1: [3], 2: [3], 3: [] },
+    };
+    const generate = () => generateTopoSortSteps(graph);
+    const { result } = renderHook(() => usePlayback(generate, [0]));
+    expect(result.current.steps.length).toBeGreaterThan(0);
+    expect(result.current.steps.at(-1)?.codeLineId).toBe("done");
+    expect(result.current.steps.at(-1)?.graph?.path?.[0]).toBe(0);
+    expect(result.current.steps.at(-1)?.graph?.path?.at(-1)).toBe(3);
     act(() => result.current.stepForward());
     expect(result.current.index).toBe(1);
   });

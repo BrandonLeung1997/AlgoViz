@@ -146,6 +146,46 @@ function parseNeighborToken(
   return { ok: true, id: Number(match[1]), weight: weight.value, explicit: true };
 }
 
+const DIRECTED_EDGE_ERROR =
+  "Use 0>1 or 0->1 for directed edges. 0-1 is undirected (both directions) and would break Kahn’s algorithm.";
+
+function addDirected(
+  adj: Record<number, number[]>,
+  a: number,
+  b: number,
+): void {
+  const aN = (adj[a] ??= []);
+  adj[b] ??= [];
+  if (!aN.includes(b)) aN.push(b);
+}
+
+function parseDirectedEdgeList(
+  trimmed: string,
+): { ok: true; graph: Graph } | { ok: false; error: string } {
+  const edgeRe = /(\d+)\s*(?:->|>)\s*(\d+)/g;
+  const matches = [...trimmed.matchAll(edgeRe)];
+  if (matches.length === 0) {
+    return {
+      ok: false,
+      error: `“${trimmed}” is not a directed edge like 0>1 or 0->1.`,
+    };
+  }
+  edgeRe.lastIndex = 0;
+  const leftover = trimmed.replace(edgeRe, " ").replace(/[\s,;]+/g, "");
+  if (leftover) {
+    return {
+      ok: false,
+      error: `“${leftover}” is not a directed edge like 0>1 or 0->1.`,
+    };
+  }
+
+  const adj: Record<number, number[]> = {};
+  for (const match of matches) {
+    addDirected(adj, Number(match[1]), Number(match[2]));
+  }
+  return finishGraph(adj);
+}
+
 function parseEdgeList(
   trimmed: string,
 ): { ok: true; graph: Graph } | { ok: false; error: string } {
@@ -213,12 +253,32 @@ function parseAdjacencyList(
   return finishGraph(adj, [], weights, keepWeights);
 }
 
+export type ParseGraphOptions = { directed?: boolean };
+
 export function parseGraphInput(
   raw: string,
+  options: ParseGraphOptions = {},
 ): { ok: true; graph: Graph } | { ok: false; error: string } {
   const trimmed = raw.trim();
   if (!trimmed) {
     return { ok: false, error: "Enter an edge list or adjacency list." };
+  }
+
+  if (options.directed) {
+    if (/\d+-\d+/.test(trimmed)) {
+      return { ok: false, error: DIRECTED_EDGE_ERROR };
+    }
+    if (/^\d+$/.test(trimmed)) {
+      const id = Number(trimmed);
+      return { ok: true, graph: { nodes: [id], adj: { [id]: [] } } };
+    }
+    if (/\d+\s*(?:->|>)\s*\d+/.test(trimmed)) {
+      return parseDirectedEdgeList(trimmed);
+    }
+    if (trimmed.includes(":")) {
+      return parseAdjacencyList(trimmed);
+    }
+    return parseDirectedEdgeList(trimmed);
   }
 
   if (/^\d+$/.test(trimmed)) {
@@ -237,7 +297,34 @@ export function parseGraphInput(
   return parseEdgeList(trimmed);
 }
 
-export function formatGraphInput(graph: Graph): string {
+export type FormatGraphOptions = { directed?: boolean };
+
+export function formatGraphInput(
+  graph: Graph,
+  options: FormatGraphOptions = {},
+): string {
+  if (options.directed) {
+    const parts: string[] = [];
+    const seen = new Set<number>();
+    for (const u of graph.nodes) {
+      for (const v of graph.adj[u] ?? []) {
+        parts.push(`${u}>${v}`);
+        seen.add(u);
+        seen.add(v);
+      }
+    }
+    const isolated = graph.nodes.filter((n) => !seen.has(n));
+    if (parts.length === 0 && graph.nodes.length === 1) {
+      return String(graph.nodes[0]);
+    }
+    if (isolated.length > 0) {
+      return graph.nodes
+        .map((u) => `${u}:${(graph.adj[u] ?? []).join(",")}`)
+        .join("; ");
+    }
+    return parts.join(", ");
+  }
+
   const parts: string[] = [];
   const seen = new Set<string>();
   for (const u of graph.nodes) {

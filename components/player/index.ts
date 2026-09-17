@@ -13,4 +13,5 @@ export { QuickSortStudio } from "./QuickSortStudio";
 export { BfsStudio } from "./BfsStudio";
 export { DfsStudio } from "./DfsStudio";
 export { DijkstraStudio } from "./DijkstraStudio";
+export { TopoSortStudio } from "./TopoSortStudio";
 export { GraphCanvas, type GraphCanvasProps } from "./GraphCanvas";

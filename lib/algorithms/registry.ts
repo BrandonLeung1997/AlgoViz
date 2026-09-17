@@ -5,20 +5,7 @@ import { quickSortMeta } from "@/lib/algorithms/quick-sort/meta";
 import { bfsMeta } from "@/lib/algorithms/bfs/meta";
 import { dfsMeta } from "@/lib/algorithms/dfs/meta";
 import { dijkstraMeta } from "@/lib/algorithms/dijkstra/meta";
-
-const topologicalSortMeta: AlgorithmMeta = {
-  slug: "topological-sort",
-  title: "Topological Sort",
-  summary: "Order vertices of a DAG so every edge goes from earlier to later.",
-  status: "coming-soon",
-  family: "graphs",
-  complexity: [
-    { label: "Best", time: "O(V+E)", space: "O(V)" },
-    { label: "Average", time: "O(V+E)", space: "O(V)" },
-    { label: "Worst", time: "O(V+E)", space: "O(V)" },
-  ],
-  complexityNote: "Kahn’s algorithm uses a queue of in-degree-zero nodes; DFS finishing times also work.",
-};
+import { topologicalSortMeta } from "@/lib/algorithms/topological-sort/meta";
 
 export const algorithms: AlgorithmMeta[] = [
   mergeSortMeta,
