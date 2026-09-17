@@ -1,21 +1,26 @@
-# AlgoViz — fill existing families
+# AlgoViz — new families
 
-These prompts complete **sorting, searching, graphs, and DP**. Do **not** add heaps, hashing, linked lists, two pointers, sliding window, or backtracking yet.
+Sorting, searching, graphs, and DP are done (19 algorithms). These prompts add **heaps, hashing, linked lists, two pointers / sliding window, and backtracking**.
 
-Run **one prompt per new agent chat**. Paste the whole file. Suggested order (later prompts assume earlier ones already landed):
+Run **one prompt per new agent chat**. Paste the whole file. First prompt in each family builds the canvas; later ones clone it.
 
-| # | Prompt | Family | Clone |
+| # | Prompt | Family | New UI |
 |---|---|---|---|
-| 1 | `01-bubble-sort.md` | sorting | Quick Sort |
-| 2 | `02-insertion-sort.md` | sorting | Quick Sort |
-| 3 | `03-selection-sort.md` | sorting | Quick Sort |
-| 4 | `04-heap-sort.md` | sorting | Quick Sort (array only) |
-| 5 | `05-linear-search.md` | searching | Binary Search |
-| 6 | `06-bellman-ford.md` | graphs | Dijkstra + directed parse |
-| 7 | `07-kruskal.md` | graphs | Dijkstra / Topo studio |
-| 8 | `08-prim.md` | graphs | Dijkstra |
-| 9 | `09-edit-distance.md` | dp | LCS |
-| 10 | `10-knapsack.md` | dp | LCS + generalize table |
-| 11 | `11-coin-change.md` | dp | Knapsack / LCS |
+| 1 | `01-heapify.md` | heaps | `HeapCanvas` (tree + array) |
+| 2 | `02-heap-insert.md` | heaps | reuse |
+| 3 | `03-extract-max.md` | heaps | reuse |
+| 4 | `04-reverse-list.md` | linked-lists | `ListCanvas` |
+| 5 | `05-cycle-detection.md` | linked-lists | reuse (cycles) |
+| 6 | `06-merge-lists.md` | linked-lists | reuse (two lists) |
+| 7 | `07-hash-chaining.md` | hashing | `HashCanvas` |
+| 8 | `08-linear-probing.md` | hashing | probing mode |
+| 9 | `09-two-sum.md` | pointers | ArrayCanvas pointers |
+| 10 | `10-sliding-window.md` | pointers | window range |
+| 11 | `11-longest-substring.md` | pointers | char cells |
+| 12 | `12-n-queens.md` | backtracking | `BoardCanvas` |
+| 13 | `13-permutations.md` | backtracking | array swaps |
+| 14 | `14-subsets.md` | backtracking | include/exclude |
 
-If a prompt fails or the chat gets long, start a **new** chat with the same prompt and say the previous attempt already created files — finish from git status.
+Do **not** start prompt 2 of a family until prompt 1 of that family has landed (canvas + `AlgorithmFamily` union). You may run different families in parallel only after each family’s first prompt exists — safest is strict 1→14.
+
+If a chat runs long, start a new one with the same prompt and say which files already exist.
