@@ -1,5 +1,6 @@
 import type { AlgorithmMeta } from "@/lib/algorithms/types";
 import { binarySearchMeta } from "@/lib/algorithms/binary-search/meta";
+import { linearSearchMeta } from "@/lib/algorithms/linear-search/meta";
 import { mergeSortMeta } from "@/lib/algorithms/merge-sort/meta";
 import { quickSortMeta } from "@/lib/algorithms/quick-sort/meta";
 import { bubbleSortMeta } from "@/lib/algorithms/bubble-sort/meta";
@@ -19,6 +20,7 @@ export const algorithms: AlgorithmMeta[] = [
   insertionSortMeta,
   selectionSortMeta,
   heapSortMeta,
+  linearSearchMeta,
   binarySearchMeta,
   bfsMeta,
   dfsMeta,

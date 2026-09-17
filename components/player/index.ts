@@ -9,6 +9,7 @@ export {
 } from "./ExplanationPanel";
 export { MergeSortStudio } from "./MergeSortStudio";
 export { BinarySearchStudio } from "./BinarySearchStudio";
+export { LinearSearchStudio } from "./LinearSearchStudio";
 export { QuickSortStudio } from "./QuickSortStudio";
 export { BubbleSortStudio } from "./BubbleSortStudio";
 export { InsertionSortStudio } from "./InsertionSortStudio";
