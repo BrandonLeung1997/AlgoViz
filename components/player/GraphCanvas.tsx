@@ -57,11 +57,22 @@ function nodeLabelColor(id: number, graph: GraphFrame): string {
 export type GraphCanvasProps = {
   step: Step | undefined;
   frontierLabel?: string;
+  showWeights?: boolean;
 };
+
+function shouldShowWeight(edge: GraphEdge, showWeights: boolean) {
+  if (showWeights) return true;
+  return edge.weight !== undefined && edge.weight !== 1;
+}
+
+function formatDist(value: number): string {
+  return Number.isFinite(value) ? String(value) : "∞";
+}
 
 export function GraphCanvas({
   step,
   frontierLabel = "Queue",
+  showWeights = false,
 }: GraphCanvasProps) {
   const graph = step?.graph;
   const nodes = graph?.nodes ?? [];
@@ -89,20 +100,41 @@ export function GraphCanvas({
               const b = pos.get(edge.to);
               if (!a || !b) return null;
               const style = edgeStyle(edge.from, edge.to, graph!);
+              const mx = (a.x + b.x) / 2;
+              const my = (a.y + b.y) / 2;
+              const dx = b.x - a.x;
+              const dy = b.y - a.y;
+              const len = Math.hypot(dx, dy) || 1;
+              const labelX = mx - (dy / len) * 10;
+              const labelY = my + (dx / len) * 10;
               return (
-                <motion.line
-                  key={`${edge.from}-${edge.to}`}
-                  x1={a.x}
-                  y1={a.y}
-                  x2={b.x}
-                  y2={b.y}
-                  stroke={style.stroke}
-                  strokeWidth={style.width}
-                  strokeLinecap="round"
-                  initial={false}
-                  animate={{ stroke: style.stroke, strokeWidth: style.width }}
-                  transition={{ duration: 0.2 }}
-                />
+                <g key={`${edge.from}-${edge.to}`}>
+                  <motion.line
+                    x1={a.x}
+                    y1={a.y}
+                    x2={b.x}
+                    y2={b.y}
+                    stroke={style.stroke}
+                    strokeWidth={style.width}
+                    strokeLinecap="round"
+                    initial={false}
+                    animate={{ stroke: style.stroke, strokeWidth: style.width }}
+                    transition={{ duration: 0.2 }}
+                  />
+                  {shouldShowWeight(edge, showWeights) ? (
+                    <text
+                      x={labelX}
+                      y={labelY}
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      fontSize={11}
+                      fontWeight={600}
+                      fill="#475569"
+                    >
+                      {edge.weight ?? 1}
+                    </text>
+                  ) : null}
+                </g>
               );
             })}
             {positions.map(({ id, x, y }) => (
@@ -129,6 +161,19 @@ export function GraphCanvas({
                 >
                   {id}
                 </text>
+                {graph?.dist && id in graph.dist ? (
+                  <text
+                    x={x}
+                    y={y + NODE_R + 11}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fontSize={10}
+                    fontWeight={600}
+                    fill="#0369a1"
+                  >
+                    d={formatDist(graph.dist[id]!)}
+                  </text>
+                ) : null}
               </g>
             ))}
           </svg>

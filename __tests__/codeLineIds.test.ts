@@ -9,6 +9,8 @@ import { BFS_CODE } from "@/lib/algorithms/bfs/code";
 import { generateBfsSteps } from "@/lib/algorithms/bfs/generateSteps";
 import { DFS_CODE } from "@/lib/algorithms/dfs/code";
 import { generateDfsSteps } from "@/lib/algorithms/dfs/generateSteps";
+import { DIJKSTRA_CODE } from "@/lib/algorithms/dijkstra/code";
+import { generateDijkstraSteps } from "@/lib/algorithms/dijkstra/generateSteps";
 import type { Graph } from "@/lib/algorithms/types";
 
 describe("merge sort code line ids", () => {
@@ -129,6 +131,41 @@ describe("dfs code line ids", () => {
       generateDfsSteps(demo, 0),
       generateDfsSteps({ nodes: [0], adj: { 0: [] } }, 0),
       generateDfsSteps(
+        {
+          nodes: [0, 1, 2],
+          adj: { 0: [1], 1: [0], 2: [] },
+        },
+        0,
+      ),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+});
+
+describe("dijkstra code line ids", () => {
+  const demo: Graph = {
+    nodes: [0, 1, 2],
+    adj: { 0: [1, 2], 1: [0, 2], 2: [0, 1] },
+    weights: { "0-1": 1, "1-2": 1, "0-2": 10 },
+  };
+
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof DIJKSTRA_CODE) =>
+      new Set(DIJKSTRA_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(DIJKSTRA_CODE.python.map((l) => l.id));
+    const runs = [
+      generateDijkstraSteps(demo, 0),
+      generateDijkstraSteps({ nodes: [0], adj: { 0: [] } }, 0),
+      generateDijkstraSteps(
         {
           nodes: [0, 1, 2],
           adj: { 0: [1], 1: [0], 2: [] },

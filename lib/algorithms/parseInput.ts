@@ -1,4 +1,13 @@
-import { MAX_ARRAY_LENGTH, MAX_GRAPH_NODES, type Graph } from "@/lib/algorithms/types";
+import {
+  MAX_ARRAY_LENGTH,
+  MAX_GRAPH_NODES,
+  getEdgeWeight,
+  undirectedEdgeKey,
+  type Graph,
+} from "@/lib/algorithms/types";
+
+const NEGATIVE_WEIGHT_ERROR =
+  "Negative edge weights are not allowed (Dijkstra needs non-negative weights).";
 
 export { MAX_ARRAY_LENGTH, MAX_GRAPH_NODES };
 
@@ -48,9 +57,24 @@ function parseNodeId(
   return { ok: true, id: Number(raw) };
 }
 
+function parseWeight(
+  raw: string,
+): { ok: true; value: number } | { ok: false; error: string } {
+  if (!/^-?\d+$/.test(raw)) {
+    return { ok: false, error: `“${raw}” is not an integer weight.` };
+  }
+  const value = Number(raw);
+  if (value < 0) {
+    return { ok: false, error: NEGATIVE_WEIGHT_ERROR };
+  }
+  return { ok: true, value };
+}
+
 function finishGraph(
   adj: Record<number, number[]>,
   extraNodes: number[] = [],
+  weights?: Record<string, number>,
+  keepWeights = false,
 ): { ok: true; graph: Graph } | { ok: false; error: string } {
   const nodeSet = new Set<number>(extraNodes);
   for (const key of Object.keys(adj)) nodeSet.add(Number(key));
@@ -68,14 +92,125 @@ function finishGraph(
   }
   for (const n of nodeSet) adj[n] ??= [];
   const nodes = [...nodeSet].sort((a, b) => a - b);
-  return { ok: true, graph: { nodes, adj } };
+  const hasNonDefault =
+    keepWeights && weights && Object.values(weights).some((w) => w !== 1);
+  return {
+    ok: true,
+    graph: hasNonDefault ? { nodes, adj, weights } : { nodes, adj },
+  };
 }
 
-function addUndirected(adj: Record<number, number[]>, a: number, b: number) {
+function setUndirectedWeight(
+  weights: Record<string, number>,
+  a: number,
+  b: number,
+  weight: number,
+): { ok: false; error: string } | null {
+  const key = undirectedEdgeKey(a, b);
+  if (weights[key] !== undefined && weights[key] !== weight) {
+    return { ok: false, error: `Conflicting weights for edge ${key}.` };
+  }
+  weights[key] = weight;
+  return null;
+}
+
+function addUndirected(
+  adj: Record<number, number[]>,
+  a: number,
+  b: number,
+  weights: Record<string, number>,
+  weight: number,
+): { ok: false; error: string } | null {
   const aN = (adj[a] ??= []);
   const bN = (adj[b] ??= []);
   if (!aN.includes(b)) aN.push(b);
   if (!bN.includes(a)) bN.push(a);
+  return setUndirectedWeight(weights, a, b, weight);
+}
+
+function parseNeighborToken(
+  token: string,
+):
+  | { ok: true; id: number; weight: number; explicit: boolean }
+  | { ok: false; error: string } {
+  const simple = parseNodeId(token);
+  if (simple.ok) {
+    return { ok: true, id: simple.id, weight: 1, explicit: false };
+  }
+  const match = token.match(/^(\d+):(-?\d+)$/);
+  if (!match) {
+    return { ok: false, error: `“${token}” is not a neighbor like 1 or 1:4.` };
+  }
+  const weight = parseWeight(match[2]!);
+  if (!weight.ok) return weight;
+  return { ok: true, id: Number(match[1]), weight: weight.value, explicit: true };
+}
+
+function parseEdgeList(
+  trimmed: string,
+): { ok: true; graph: Graph } | { ok: false; error: string } {
+  const edgeRe = /(\d+)-(\d+)(?:\s*(?::(-?\d+)|\((-?\d+)\)))?/g;
+  const matches = [...trimmed.matchAll(edgeRe)];
+  if (matches.length === 0) {
+    return { ok: false, error: `“${trimmed}” is not an edge like 0-1.` };
+  }
+  edgeRe.lastIndex = 0;
+  const leftover = trimmed.replace(edgeRe, " ").replace(/[\s,;]+/g, "");
+  if (leftover) {
+    return { ok: false, error: `“${leftover}” is not an edge like 0-1.` };
+  }
+
+  const adj: Record<number, number[]> = {};
+  const weights: Record<string, number> = {};
+  let keepWeights = false;
+  for (const match of matches) {
+    const a = Number(match[1]);
+    const b = Number(match[2]);
+    const wRaw = match[3] ?? match[4];
+    let weight = 1;
+    if (wRaw !== undefined) {
+      const parsed = parseWeight(wRaw);
+      if (!parsed.ok) return parsed;
+      weight = parsed.value;
+      keepWeights = true;
+    }
+    if (a === b) continue;
+    const conflict = addUndirected(adj, a, b, weights, weight);
+    if (conflict) return conflict;
+  }
+  return finishGraph(adj, [], weights, keepWeights);
+}
+
+function parseAdjacencyList(
+  trimmed: string,
+): { ok: true; graph: Graph } | { ok: false; error: string } {
+  const adj: Record<number, number[]> = {};
+  const weights: Record<string, number> = {};
+  let keepWeights = false;
+  const entries = trimmed.split(/[;\n]+/).map((e) => e.trim()).filter(Boolean);
+  for (const entry of entries) {
+    const colon = entry.indexOf(":");
+    if (colon < 0) {
+      return { ok: false, error: `“${entry}” is not an adjacency entry.` };
+    }
+    const left = entry.slice(0, colon).trim();
+    const right = entry.slice(colon + 1).trim();
+    const node = parseNodeId(left);
+    if (!node.ok) return node;
+    const neighbors: number[] = [];
+    if (right) {
+      for (const token of right.split(/[\s,]+/).filter(Boolean)) {
+        const n = parseNeighborToken(token);
+        if (!n.ok) return n;
+        if (n.explicit) keepWeights = true;
+        if (!neighbors.includes(n.id)) neighbors.push(n.id);
+        const conflict = setUndirectedWeight(weights, node.id, n.id, n.weight);
+        if (conflict) return conflict;
+      }
+    }
+    adj[node.id] = neighbors;
+  }
+  return finishGraph(adj, [], weights, keepWeights);
 }
 
 export function parseGraphInput(
@@ -91,44 +226,15 @@ export function parseGraphInput(
     return { ok: true, graph: { nodes: [id], adj: { [id]: [] } } };
   }
 
-  if (trimmed.includes(":")) {
-    const adj: Record<number, number[]> = {};
-    const entries = trimmed.split(/[;\n]+/).map((e) => e.trim()).filter(Boolean);
-    for (const entry of entries) {
-      const colon = entry.indexOf(":");
-      if (colon < 0) {
-        return { ok: false, error: `“${entry}” is not an adjacency entry.` };
-      }
-      const left = entry.slice(0, colon).trim();
-      const right = entry.slice(colon + 1).trim();
-      const node = parseNodeId(left);
-      if (!node.ok) return node;
-      const neighbors: number[] = [];
-      if (right) {
-        for (const token of right.split(/[\s,]+/).filter(Boolean)) {
-          const n = parseNodeId(token);
-          if (!n.ok) return n;
-          if (!neighbors.includes(n.id)) neighbors.push(n.id);
-        }
-      }
-      adj[node.id] = neighbors;
-    }
-    return finishGraph(adj);
+  if (/\d+-\d+/.test(trimmed)) {
+    return parseEdgeList(trimmed);
   }
 
-  const adj: Record<number, number[]> = {};
-  const tokens = trimmed.split(/[\s,]+/).filter(Boolean);
-  for (const token of tokens) {
-    const match = token.match(/^(\d+)-(\d+)$/);
-    if (!match) {
-      return { ok: false, error: `“${token}” is not an edge like 0-1.` };
-    }
-    const a = Number(match[1]);
-    const b = Number(match[2]);
-    if (a === b) continue;
-    addUndirected(adj, a, b);
+  if (trimmed.includes(":")) {
+    return parseAdjacencyList(trimmed);
   }
-  return finishGraph(adj);
+
+  return parseEdgeList(trimmed);
 }
 
 export function formatGraphInput(graph: Graph): string {
@@ -140,7 +246,8 @@ export function formatGraphInput(graph: Graph): string {
       const key = `${u}-${v}`;
       if (seen.has(key)) continue;
       seen.add(key);
-      parts.push(key);
+      const weight = getEdgeWeight(graph, u, v);
+      parts.push(weight !== 1 ? `${key}:${weight}` : key);
     }
   }
   if (parts.length === 0 && graph.nodes.length === 1) {

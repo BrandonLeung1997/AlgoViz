@@ -12,4 +12,5 @@ export { BinarySearchStudio } from "./BinarySearchStudio";
 export { QuickSortStudio } from "./QuickSortStudio";
 export { BfsStudio } from "./BfsStudio";
 export { DfsStudio } from "./DfsStudio";
+export { DijkstraStudio } from "./DijkstraStudio";
 export { GraphCanvas, type GraphCanvasProps } from "./GraphCanvas";

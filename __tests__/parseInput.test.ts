@@ -3,6 +3,7 @@ import {
   parseArrayInput,
   parseTargetInput,
   parseGraphInput,
+  formatGraphInput,
   MAX_ARRAY_LENGTH,
   MAX_GRAPH_NODES,
 } from "@/lib/algorithms/parseInput";
@@ -88,5 +89,64 @@ describe("parseGraphInput", () => {
 
   it("rejects malformed tokens", () => {
     expect(parseGraphInput("0-1, nope").ok).toBe(false);
+  });
+
+  it("parses weighted edges with colon or parentheses", () => {
+    const colon = parseGraphInput("0-1:4, 1-2:1, 0-2:10");
+    expect(colon.ok).toBe(true);
+    if (!colon.ok) return;
+    expect(colon.graph.nodes).toEqual([0, 1, 2]);
+    expect(colon.graph.adj[0]).toEqual(expect.arrayContaining([1, 2]));
+    expect(colon.graph.weights).toEqual({ "0-1": 4, "1-2": 1, "0-2": 10 });
+
+    const parens = parseGraphInput("0-1 (4), 1-2 (1), 0-2 (10)");
+    expect(parens.ok).toBe(true);
+    if (!parens.ok) return;
+    expect(parens.graph.weights).toEqual({ "0-1": 4, "1-2": 1, "0-2": 10 });
+  });
+
+  it("parses a weighted adjacency list without breaking unweighted lists", () => {
+    const weighted = parseGraphInput("0:1:4,2:1; 1:0:4,2:1; 2:0:1,1:1");
+    expect(weighted.ok).toBe(true);
+    if (!weighted.ok) return;
+    expect(weighted.graph.adj[0]).toEqual([1, 2]);
+    expect(weighted.graph.weights?.["0-1"]).toBe(4);
+    expect(weighted.graph.weights?.["0-2"]).toBe(1);
+    expect(weighted.graph.weights?.["1-2"]).toBe(1);
+
+    const unweighted = parseGraphInput("0:1,2; 1:0,3; 2:0; 3:1");
+    expect(unweighted.ok).toBe(true);
+    if (!unweighted.ok) return;
+    expect(unweighted.graph.adj[0]).toEqual([1, 2]);
+    expect(unweighted.graph.weights).toBeUndefined();
+  });
+
+  it("rejects negative edge weights", () => {
+    const colon = parseGraphInput("0-1:-3");
+    expect(colon.ok).toBe(false);
+    if (colon.ok) return;
+    expect(colon.error.toLowerCase()).toMatch(/negative/);
+
+    const parens = parseGraphInput("0-1 (-2)");
+    expect(parens.ok).toBe(false);
+    if (parens.ok) return;
+    expect(parens.error.toLowerCase()).toMatch(/negative/);
+
+    const adj = parseGraphInput("0:1:-5");
+    expect(adj.ok).toBe(false);
+    if (adj.ok) return;
+    expect(adj.error.toLowerCase()).toMatch(/negative/);
+  });
+
+  it("formats unweighted graphs as before and weighted graphs with colon weights", () => {
+    const unweighted = parseGraphInput("0-1, 0-2, 1-3");
+    expect(unweighted.ok).toBe(true);
+    if (!unweighted.ok) return;
+    expect(formatGraphInput(unweighted.graph)).toBe("0-1, 0-2, 1-3");
+
+    const weighted = parseGraphInput("0-1:4, 1-2:1, 0-2:10");
+    expect(weighted.ok).toBe(true);
+    if (!weighted.ok) return;
+    expect(formatGraphInput(weighted.graph)).toBe("0-1:4, 0-2:10, 1-2");
   });
 });

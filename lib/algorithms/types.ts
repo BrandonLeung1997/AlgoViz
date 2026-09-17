@@ -17,11 +17,13 @@ export type HighlightKind =
 
 export type Highlight = { index: number; kind: HighlightKind };
 
-export type GraphEdge = { from: number; to: number };
+export type GraphEdge = { from: number; to: number; weight?: number };
 
 export type Graph = {
   nodes: number[];
   adj: Record<number, number[]>;
+  /** Undirected key `${min}-${max}` → weight. Missing means 1. */
+  weights?: Record<string, number>;
 };
 
 export type GraphFrame = {
@@ -35,7 +37,16 @@ export type GraphFrame = {
   path: number[];
   treeEdges: GraphEdge[];
   relaxedEdges: GraphEdge[];
+  dist?: Record<number, number>;
 };
+
+export function undirectedEdgeKey(a: number, b: number): string {
+  return a < b ? `${a}-${b}` : `${b}-${a}`;
+}
+
+export function getEdgeWeight(graph: Graph, u: number, v: number): number {
+  return graph.weights?.[undirectedEdgeKey(u, v)] ?? 1;
+}
 
 export type Step = {
   array: number[];

@@ -4,20 +4,7 @@ import { mergeSortMeta } from "@/lib/algorithms/merge-sort/meta";
 import { quickSortMeta } from "@/lib/algorithms/quick-sort/meta";
 import { bfsMeta } from "@/lib/algorithms/bfs/meta";
 import { dfsMeta } from "@/lib/algorithms/dfs/meta";
-
-const dijkstraMeta: AlgorithmMeta = {
-  slug: "dijkstra",
-  title: "Dijkstra",
-  summary: "Find shortest paths on weighted graphs with non-negative edges.",
-  status: "coming-soon",
-  family: "graphs",
-  complexity: [
-    { label: "Best", time: "O((V+E) log V)", space: "O(V)" },
-    { label: "Average", time: "O((V+E) log V)", space: "O(V)" },
-    { label: "Worst", time: "O((V+E) log V)", space: "O(V)" },
-  ],
-  complexityNote: "Priority queue of distances; BFS is the unweighted special case.",
-};
+import { dijkstraMeta } from "@/lib/algorithms/dijkstra/meta";
 
 const topologicalSortMeta: AlgorithmMeta = {
   slug: "topological-sort",
