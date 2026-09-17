@@ -7,6 +7,8 @@ import { QUICK_SORT_CODE } from "@/lib/algorithms/quick-sort/code";
 import { generateQuickSortSteps } from "@/lib/algorithms/quick-sort/generateSteps";
 import { BUBBLE_SORT_CODE } from "@/lib/algorithms/bubble-sort/code";
 import { generateBubbleSortSteps } from "@/lib/algorithms/bubble-sort/generateSteps";
+import { INSERTION_SORT_CODE } from "@/lib/algorithms/insertion-sort/code";
+import { generateInsertionSortSteps } from "@/lib/algorithms/insertion-sort/generateSteps";
 import { BFS_CODE } from "@/lib/algorithms/bfs/code";
 import { generateBfsSteps } from "@/lib/algorithms/bfs/generateSteps";
 import { DFS_CODE } from "@/lib/algorithms/dfs/code";
@@ -99,6 +101,31 @@ describe("bubble sort code line ids", () => {
       generateBubbleSortSteps([1, 2, 3, 4]),
       generateBubbleSortSteps([7]),
       generateBubbleSortSteps([]),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+});
+
+describe("insertion sort code line ids", () => {
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof INSERTION_SORT_CODE) =>
+      new Set(INSERTION_SORT_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(INSERTION_SORT_CODE.python.map((l) => l.id));
+    const runs = [
+      generateInsertionSortSteps([9, 4, 1, 7, 3]),
+      generateInsertionSortSteps([1, 2, 3, 4]),
+      generateInsertionSortSteps([4, 3, 2, 1]),
+      generateInsertionSortSteps([7]),
+      generateInsertionSortSteps([]),
     ];
     for (const steps of runs) {
       for (const step of steps) {

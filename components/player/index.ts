@@ -11,6 +11,7 @@ export { MergeSortStudio } from "./MergeSortStudio";
 export { BinarySearchStudio } from "./BinarySearchStudio";
 export { QuickSortStudio } from "./QuickSortStudio";
 export { BubbleSortStudio } from "./BubbleSortStudio";
+export { InsertionSortStudio } from "./InsertionSortStudio";
 export { BfsStudio } from "./BfsStudio";
 export { DfsStudio } from "./DfsStudio";
 export { DijkstraStudio } from "./DijkstraStudio";
