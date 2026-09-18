@@ -1,6 +1,8 @@
 import {
   MAX_ARRAY_LENGTH,
   MAX_GRAPH_NODES,
+  MAX_HASH_BUCKETS,
+  MAX_HASH_KEYS,
   MAX_HEAP_SIZE,
   MAX_LIST_LENGTH,
   MAX_STRING_LENGTH,
@@ -17,6 +19,8 @@ const NEGATIVE_WEIGHT_ERROR =
 export {
   MAX_ARRAY_LENGTH,
   MAX_GRAPH_NODES,
+  MAX_HASH_BUCKETS,
+  MAX_HASH_KEYS,
   MAX_HEAP_SIZE,
   MAX_LIST_LENGTH,
   MAX_STRING_LENGTH,
@@ -101,6 +105,65 @@ export function parseMergeListInput(
 ): { ok: true; values: number[] } | { ok: false; error: string } {
   if (raw.trim() === "") return { ok: true, values: [] };
   return parseListInput(raw);
+}
+
+export function parseHashKeysInput(
+  raw: string,
+): { ok: true; values: number[] } | { ok: false; error: string } {
+  if (raw.trim() === "") return { ok: true, values: [] };
+  const parts = raw.trim().split(/[\s,]+/).filter(Boolean);
+  if (parts.length > MAX_HASH_KEYS) {
+    return {
+      ok: false,
+      error: `Use at most ${MAX_HASH_KEYS} numbers.`,
+    };
+  }
+  const values: number[] = [];
+  for (const part of parts) {
+    if (!/^-?\d+$/.test(part)) {
+      return { ok: false, error: `“${part}” is not an integer.` };
+    }
+    const value = Number(part);
+    if (value < 0) {
+      return { ok: false, error: "Use non-negative integers only." };
+    }
+    values.push(value);
+  }
+  return { ok: true, values };
+}
+
+export function parseBucketCount(
+  raw: string,
+): { ok: true; value: number } | { ok: false; error: string } {
+  const trimmed = raw.trim();
+  if (!/^\d+$/.test(trimmed)) {
+    return { ok: false, error: `“${trimmed}” is not an integer.` };
+  }
+  const value = Number(trimmed);
+  if (value < 3 || value > MAX_HASH_BUCKETS) {
+    return {
+      ok: false,
+      error: `Bucket count must be between 3 and ${MAX_HASH_BUCKETS}.`,
+    };
+  }
+  return { ok: true, value };
+}
+
+export function parseHashKeyInput(
+  raw: string,
+): { ok: true; value: number } | { ok: false; error: string } {
+  const trimmed = raw.trim();
+  if (!trimmed) {
+    return { ok: false, error: "Enter a search key integer." };
+  }
+  if (!/^-?\d+$/.test(trimmed)) {
+    return { ok: false, error: `“${trimmed}” is not an integer.` };
+  }
+  const value = Number(trimmed);
+  if (value < 0) {
+    return { ok: false, error: "Use non-negative integers only." };
+  }
+  return { ok: true, value };
 }
 
 export function parseCycleIndex(

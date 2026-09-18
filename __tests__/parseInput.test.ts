@@ -14,6 +14,11 @@ import {
   MAX_HEAP_SIZE,
   MAX_LIST_LENGTH,
   MAX_STRING_LENGTH,
+  parseHashKeysInput,
+  parseBucketCount,
+  parseHashKeyInput,
+  MAX_HASH_KEYS,
+  MAX_HASH_BUCKETS,
 } from "@/lib/algorithms/parseInput";
 
 describe("parseArrayInput", () => {
@@ -398,5 +403,54 @@ describe("parseStringInput", () => {
   it("accepts a string at the length cap", () => {
     const raw = "A".repeat(MAX_STRING_LENGTH);
     expect(parseStringInput(raw)).toEqual({ ok: true, value: raw });
+  });
+});
+
+describe("parseHashKeysInput", () => {
+  it("treats empty and whitespace as no keys", () => {
+    expect(parseHashKeysInput("")).toEqual({ ok: true, values: [] });
+    expect(parseHashKeysInput("   ")).toEqual({ ok: true, values: [] });
+  });
+
+  it("parses non-negative integers", () => {
+    expect(parseHashKeysInput("10, 15, 20")).toEqual({
+      ok: true,
+      values: [10, 15, 20],
+    });
+  });
+
+  it("rejects a negative key", () => {
+    const result = parseHashKeysInput("10, -1");
+    expect(result.ok).toBe(false);
+  });
+
+  it("rejects more than MAX_HASH_KEYS values", () => {
+    const raw = Array.from({ length: MAX_HASH_KEYS + 1 }, (_, i) => i).join(",");
+    const result = parseHashKeysInput(raw);
+    expect(result.ok).toBe(false);
+  });
+});
+
+describe("parseBucketCount", () => {
+  it("accepts 3 and 8", () => {
+    expect(parseBucketCount("3")).toEqual({ ok: true, value: 3 });
+    expect(parseBucketCount("8")).toEqual({ ok: true, value: 8 });
+  });
+
+  it("rejects 2 and 9", () => {
+    expect(parseBucketCount("2").ok).toBe(false);
+    expect(parseBucketCount("9").ok).toBe(false);
+  });
+});
+
+describe("parseHashKeyInput", () => {
+  it("parses a non-negative integer", () => {
+    expect(parseHashKeyInput("15")).toEqual({ ok: true, value: 15 });
+  });
+
+  it("rejects empty, negative, and non-integer", () => {
+    expect(parseHashKeyInput("  ").ok).toBe(false);
+    expect(parseHashKeyInput("-1").ok).toBe(false);
+    expect(parseHashKeyInput("1.5").ok).toBe(false);
   });
 });

@@ -94,6 +94,17 @@ export type ListFrame = {
   highlightIds?: number[];
 };
 
+export type HashFrame = {
+  bucketCount: number;
+  buckets: number[][];
+  op?: "insert" | "search";
+  key?: number;
+  hashIndex?: number;
+  current?: { bucket: number; offset: number } | null;
+  found?: boolean;
+  status?: string;
+};
+
 export type Step = {
   array: number[];
   highlights: Highlight[];
@@ -102,6 +113,7 @@ export type Step = {
   dpTable?: DpTableFrame;
   heap?: HeapFrame;
   list?: ListFrame;
+  hash?: HashFrame;
   codeLineId: string;
   explanation: string;
 };
@@ -120,7 +132,8 @@ export type AlgorithmFamily =
   | "graphs"
   | "dp"
   | "heaps"
-  | "linked-lists";
+  | "linked-lists"
+  | "hashing";
 
 export type AlgorithmMeta = {
   slug: string;
@@ -144,3 +157,5 @@ export const MAX_KNAPSACK_ITEMS = 6;
 export const MAX_KNAPSACK_CAPACITY = 12;
 export const MAX_COIN_TYPES = 6;
 export const MAX_COIN_AMOUNT = 15;
+export const MAX_HASH_KEYS = 10;
+export const MAX_HASH_BUCKETS = 8;
