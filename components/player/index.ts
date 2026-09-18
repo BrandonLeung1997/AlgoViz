@@ -33,6 +33,7 @@ export { HeapCanvas, type HeapCanvasProps } from "./HeapCanvas";
 export { ListCanvas, type ListCanvasProps } from "./ListCanvas";
 export { GraphCanvas, type GraphCanvasProps } from "./GraphCanvas";
 export { TableCanvas, type TableCanvasProps } from "./TableCanvas";
+export { HashCanvas, type HashCanvasProps } from "./HashCanvas";
 export { ReverseListStudio } from "./ReverseListStudio";
 export { CycleDetectionStudio } from "./CycleDetectionStudio";
 export { MergeListsStudio } from "./MergeListsStudio";
