@@ -37,3 +37,4 @@ export { HashCanvas, type HashCanvasProps } from "./HashCanvas";
 export { ReverseListStudio } from "./ReverseListStudio";
 export { CycleDetectionStudio } from "./CycleDetectionStudio";
 export { MergeListsStudio } from "./MergeListsStudio";
+export { HashChainingStudio } from "./HashChainingStudio";

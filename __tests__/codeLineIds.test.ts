@@ -54,6 +54,8 @@ import { CYCLE_DETECTION_CODE } from "@/lib/algorithms/cycle-detection/code";
 import { generateCycleDetectionSteps } from "@/lib/algorithms/cycle-detection/generateSteps";
 import { MERGE_LISTS_CODE } from "@/lib/algorithms/merge-lists/code";
 import { generateMergeListsSteps } from "@/lib/algorithms/merge-lists/generateSteps";
+import { HASH_CHAINING_CODE } from "@/lib/algorithms/hash-chaining/code";
+import { generateHashChainingSteps } from "@/lib/algorithms/hash-chaining/generateSteps";
 import type { Graph } from "@/lib/algorithms/types";
 
 describe("merge sort code line ids", () => {
@@ -771,6 +773,30 @@ describe("merge lists code line ids", () => {
       generateMergeListsSteps([1, 3], []),
       generateMergeListsSteps([], []),
       generateMergeListsSteps([1, 1], [1, 2]),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+});
+
+describe("hash chaining code line ids", () => {
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof HASH_CHAINING_CODE) =>
+      new Set(HASH_CHAINING_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(HASH_CHAINING_CODE.python.map((l) => l.id));
+    const runs = [
+      generateHashChainingSteps([10, 15, 20], 5, 15),
+      generateHashChainingSteps([10, 15, 20], 5, 1),
+      generateHashChainingSteps([], 5, 1),
+      generateHashChainingSteps([10, 10], 5, 10),
     ];
     for (const steps of runs) {
       for (const step of steps) {

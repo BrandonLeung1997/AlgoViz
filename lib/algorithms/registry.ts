@@ -24,6 +24,7 @@ import { extractMaxMeta } from "@/lib/algorithms/extract-max/meta";
 import { reverseListMeta } from "@/lib/algorithms/reverse-list/meta";
 import { cycleDetectionMeta } from "@/lib/algorithms/cycle-detection/meta";
 import { mergeListsMeta } from "@/lib/algorithms/merge-lists/meta";
+import { hashChainingMeta } from "@/lib/algorithms/hash-chaining/meta";
 
 export const algorithms: AlgorithmMeta[] = [
   mergeSortMeta,
@@ -51,6 +52,7 @@ export const algorithms: AlgorithmMeta[] = [
   reverseListMeta,
   cycleDetectionMeta,
   mergeListsMeta,
+  hashChainingMeta,
 ];
 
 export const FAMILY_ORDER = [
@@ -60,6 +62,7 @@ export const FAMILY_ORDER = [
   "dp",
   "heaps",
   "linked-lists",
+  "hashing",
 ] as const;
 
 export const FAMILY_TITLES: Record<(typeof FAMILY_ORDER)[number], string> = {
@@ -69,6 +72,7 @@ export const FAMILY_TITLES: Record<(typeof FAMILY_ORDER)[number], string> = {
   dp: "Dynamic Programming",
   heaps: "Heaps",
   "linked-lists": "Linked Lists",
+  hashing: "Hashing",
 };
 
 export function getAlgorithm(slug: string): AlgorithmMeta | undefined {

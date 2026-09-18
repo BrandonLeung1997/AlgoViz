@@ -37,3 +37,19 @@ export function randomSortedListPair(): [number[], number[]] {
   const sortN = (xs: number[]) => [...xs].sort((x, y) => x - y);
   return [sortN(pool.slice(0, nA)), sortN(pool.slice(nA))];
 }
+
+export function randomHashChaining(): {
+  keys: number[];
+  bucketCount: number;
+  searchKey: number;
+} {
+  const keys = shuffledPool(6);
+  const set = new Set(keys);
+  let miss = 0;
+  while (set.has(miss)) miss += 1;
+  const searchKey =
+    Math.random() < 0.5
+      ? keys[Math.floor(Math.random() * keys.length)]!
+      : miss;
+  return { keys, bucketCount: 5, searchKey };
+}
