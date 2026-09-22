@@ -17,7 +17,15 @@ export function HashCanvas({ step }: HashCanvasProps) {
     );
   }
 
-  const { bucketCount, buckets, hashIndex, current, found, key, status } = hash;
+  const {
+    bucketCount,
+    hashIndex,
+    current,
+    found,
+    key,
+    status,
+  } = hash;
+  const buckets = hash.buckets ?? [];
 
   return (
     <div>

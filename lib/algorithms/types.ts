@@ -96,11 +96,14 @@ export type ListFrame = {
 
 export type HashFrame = {
   bucketCount: number;
-  buckets: number[][];
+  buckets?: number[][];
+  slots?: (number | null)[];
+  layout?: "chain" | "probe";
   op?: "insert" | "search";
   key?: number;
   hashIndex?: number;
   current?: { bucket: number; offset: number } | null;
+  probeIndex?: number;
   found?: boolean;
   status?: string;
 };

@@ -5,8 +5,8 @@ import { HASH_CHAINING_CODE } from "@/lib/algorithms/hash-chaining/code";
 describe("generateHashChainingSteps", () => {
   it("inserts [10, 15, 20] into bucket 0 when m is 5", () => {
     const last = generateHashChainingSteps([10, 15, 20], 5, 15).at(-1)!;
-    expect(last.hash!.buckets[0]).toEqual([10, 15, 20]);
-    expect(last.hash!.buckets.slice(1)).toEqual([[], [], [], []]);
+    expect(last.hash!.buckets![0]).toEqual([10, 15, 20]);
+    expect(last.hash!.buckets!.slice(1)).toEqual([[], [], [], []]);
   });
 
   it("emits search found for 15 after those inserts", () => {
@@ -29,7 +29,7 @@ describe("generateHashChainingSteps", () => {
 
   it("skips a duplicate insert", () => {
     const steps = generateHashChainingSteps([10, 10], 5, 10);
-    expect(steps.at(-1)!.hash!.buckets[0]).toEqual([10]);
+    expect(steps.at(-1)!.hash!.buckets![0]).toEqual([10]);
     expect(
       steps.some((s) => s.codeLineId === "found" && s.hash?.op === "insert"),
     ).toBe(true);
@@ -53,7 +53,7 @@ describe("generateHashChainingSteps", () => {
       expect(steps.length).toBeGreaterThan(0);
       for (const step of steps) {
         expect(step.hash).toBeDefined();
-        expect(step.hash!.buckets.length).toBe(step.hash!.bucketCount);
+        expect(step.hash!.buckets!.length).toBe(step.hash!.bucketCount);
         expect(step.explanation.trim().length).toBeGreaterThan(0);
         expect(valid.has(step.codeLineId)).toBe(true);
       }
