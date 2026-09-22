@@ -17,14 +17,68 @@ export function HashCanvas({ step }: HashCanvasProps) {
     );
   }
 
-  const {
-    bucketCount,
-    hashIndex,
-    current,
-    found,
-    key,
-    status,
-  } = hash;
+  if (hash.layout === "probe") {
+    const { bucketCount, hashIndex, probeIndex, found, key, status } = hash;
+    const slots = hash.slots ?? Array.from({ length: bucketCount }, () => null);
+    return (
+      <div>
+        <p className="text-center text-sm text-slate-600">
+          h(k, i) = (k % m + i) % m
+          {key !== undefined && hashIndex !== undefined
+            ? `  ·  k = ${key} → home ${hashIndex}`
+            : null}
+        </p>
+        {status ? (
+          <p className="mt-1 text-center text-xs text-slate-500">{status}</p>
+        ) : null}
+        <div
+          className="mt-3 flex flex-wrap items-end justify-center gap-2"
+          aria-label="Hash table"
+        >
+          {Array.from({ length: bucketCount }, (_, j) => {
+            const value = slots[j] ?? null;
+            const isHome = hashIndex === j;
+            const isProbe = probeIndex === j;
+            const isFound = isProbe && found === true;
+            return (
+              <div key={j} className="flex flex-col items-center gap-1">
+                <span
+                  className={cn(
+                    "font-mono text-xs",
+                    isHome ? "font-semibold text-sky-700" : "text-slate-500",
+                  )}
+                >
+                  {j}
+                </span>
+                <span
+                  aria-label={`slot ${j}`}
+                  className={cn(
+                    "flex h-10 w-10 items-center justify-center rounded-md font-mono text-sm",
+                    isFound
+                      ? "bg-green-500 text-white"
+                      : isProbe
+                        ? "bg-amber-400 text-slate-900"
+                        : isHome
+                          ? "bg-sky-50 text-slate-900"
+                          : value === null
+                            ? "border border-dashed border-slate-300 text-slate-400"
+                            : "bg-slate-700 text-white",
+                  )}
+                >
+                  {value === null ? "∅" : value}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        <p className="mt-3 text-center text-xs text-slate-500">
+          home · probe · found
+        </p>
+      </div>
+    );
+  }
+
+  const { bucketCount, hashIndex, current, found, key, status } = hash;
   const buckets = hash.buckets ?? [];
 
   return (
