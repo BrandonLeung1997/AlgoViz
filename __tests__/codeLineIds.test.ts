@@ -56,6 +56,8 @@ import { MERGE_LISTS_CODE } from "@/lib/algorithms/merge-lists/code";
 import { generateMergeListsSteps } from "@/lib/algorithms/merge-lists/generateSteps";
 import { HASH_CHAINING_CODE } from "@/lib/algorithms/hash-chaining/code";
 import { generateHashChainingSteps } from "@/lib/algorithms/hash-chaining/generateSteps";
+import { LINEAR_PROBING_CODE } from "@/lib/algorithms/linear-probing/code";
+import { generateLinearProbingSteps } from "@/lib/algorithms/linear-probing/generateSteps";
 import type { Graph } from "@/lib/algorithms/types";
 
 describe("merge sort code line ids", () => {
@@ -797,6 +799,32 @@ describe("hash chaining code line ids", () => {
       generateHashChainingSteps([10, 15, 20], 5, 1),
       generateHashChainingSteps([], 5, 1),
       generateHashChainingSteps([10, 10], 5, 10),
+    ];
+    for (const steps of runs) {
+      for (const step of steps) {
+        expect(valid.has(step.codeLineId)).toBe(true);
+      }
+    }
+  });
+});
+
+describe("linear probing code line ids", () => {
+  it("python, javascript, and cpp share the same id set", () => {
+    const ids = (lang: keyof typeof LINEAR_PROBING_CODE) =>
+      new Set(LINEAR_PROBING_CODE[lang].map((l) => l.id));
+    expect(ids("javascript")).toEqual(ids("python"));
+    expect(ids("cpp")).toEqual(ids("python"));
+  });
+
+  it("every generated step codeLineId exists in the listings", () => {
+    const valid = new Set(LINEAR_PROBING_CODE.python.map((l) => l.id));
+    const runs = [
+      generateLinearProbingSteps([5, 12], 7, 12),
+      generateLinearProbingSteps([5, 12], 7, 4),
+      generateLinearProbingSteps([], 7, 1),
+      generateLinearProbingSteps([5, 5], 7, 5),
+      generateLinearProbingSteps([0, 1, 2, 99], 3, 0),
+      generateLinearProbingSteps([0, 1, 2], 3, 99),
     ];
     for (const steps of runs) {
       for (const step of steps) {

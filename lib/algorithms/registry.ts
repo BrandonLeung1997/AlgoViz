@@ -25,6 +25,7 @@ import { reverseListMeta } from "@/lib/algorithms/reverse-list/meta";
 import { cycleDetectionMeta } from "@/lib/algorithms/cycle-detection/meta";
 import { mergeListsMeta } from "@/lib/algorithms/merge-lists/meta";
 import { hashChainingMeta } from "@/lib/algorithms/hash-chaining/meta";
+import { linearProbingMeta } from "@/lib/algorithms/linear-probing/meta";
 
 export const algorithms: AlgorithmMeta[] = [
   mergeSortMeta,
@@ -53,6 +54,7 @@ export const algorithms: AlgorithmMeta[] = [
   cycleDetectionMeta,
   mergeListsMeta,
   hashChainingMeta,
+  linearProbingMeta,
 ];
 
 export const FAMILY_ORDER = [

@@ -38,3 +38,4 @@ export { ReverseListStudio } from "./ReverseListStudio";
 export { CycleDetectionStudio } from "./CycleDetectionStudio";
 export { MergeListsStudio } from "./MergeListsStudio";
 export { HashChainingStudio } from "./HashChainingStudio";
+export { LinearProbingStudio } from "./LinearProbingStudio";

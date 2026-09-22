@@ -53,3 +53,21 @@ export function randomHashChaining(): {
       : miss;
   return { keys, bucketCount: 5, searchKey };
 }
+
+export function randomLinearProbing(): {
+  keys: number[];
+  tableSize: number;
+  searchKey: number;
+} {
+  const tableSize = 7;
+  const n = 3 + Math.floor(Math.random() * 3);
+  const keys = shuffledPool(n);
+  const set = new Set(keys);
+  let miss = 0;
+  while (set.has(miss)) miss += 1;
+  const searchKey =
+    Math.random() < 0.5
+      ? keys[Math.floor(Math.random() * keys.length)]!
+      : miss;
+  return { keys, tableSize, searchKey };
+}
